@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "662815783211",
+    "project_id": "filmtok-database",
+    "storage_bucket": "filmtok-database.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:662815783211:android:5d2366459aee4dd72a6d6e",
+        "android_client_info": {
+          "package_name": "com.example.filmtok"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAV5Sv3V33gxuTWZzObiAby-NcgS5CbZKI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
