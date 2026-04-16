@@ -32,6 +32,7 @@ import com.example.filmtok.ui.viewmodel.ProfileViewModel
 
 @Composable
 fun UserProfileScreen(
+    onLogout: () -> Unit,
     viewModel: ProfileViewModel = viewModel()
 ) {
     val user by viewModel.user.collectAsState()
@@ -75,7 +76,7 @@ fun UserProfileScreen(
             
             Spacer(modifier = Modifier.height(24.dp))
             
-            SettingsSection()
+            SettingsSection(onLogout = onLogout)
             
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -267,7 +268,7 @@ fun AchievementItem(modifier: Modifier = Modifier, achievement: Achievement) {
 }
 
 @Composable
-fun SettingsSection() {
+fun SettingsSection(onLogout: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Surface(
             color = Color(0xFF1E1E1E),
@@ -317,7 +318,7 @@ fun SettingsSection() {
         }
 
         TextButton(
-            onClick = { },
+            onClick = onLogout,
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(16.dp)
         ) {

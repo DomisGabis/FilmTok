@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -35,6 +34,7 @@ import com.example.filmtok.ui.viewmodel.AdminViewModel
 @Composable
 fun AdminAddMovieScreen(
     onBackClick: () -> Unit,
+    movieId: String? = null,
     viewModel: AdminViewModel = viewModel()
 ) {
     var title by remember { mutableStateOf("") }
@@ -47,6 +47,8 @@ fun AdminAddMovieScreen(
     
     var posterUri by remember { mutableStateOf<Uri?>(null) }
     var backdropUri by remember { mutableStateOf<Uri?>(null) }
+    var existingPosterUrl by remember { mutableStateOf("") }
+    var existingBackdropUrl by remember { mutableStateOf("") }
     
     // Obsada
     var actorName by remember { mutableStateOf("") }
@@ -56,12 +58,37 @@ fun AdminAddMovieScreen(
 
     val isSaving by viewModel.isSaving.collectAsState()
     val saveSuccess by viewModel.saveSuccess.collectAsState()
+    val movieToEdit by viewModel.movieToEdit.collectAsState()
 
     val posterLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         posterUri = uri
     }
     val backdropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         backdropUri = uri
+    }
+
+    LaunchedEffect(movieId) {
+        if (movieId != null) {
+            viewModel.loadMovie(movieId)
+        } else {
+            viewModel.clearMovieToEdit()
+        }
+    }
+
+    LaunchedEffect(movieToEdit) {
+        movieToEdit?.let { movie ->
+            title = movie.title
+            director = movie.director
+            year = movie.year.toString()
+            duration = movie.duration
+            rating = movie.rating.toString()
+            genre = movie.genres.joinToString(", ")
+            description = movie.description
+            existingPosterUrl = movie.posterUrl
+            existingBackdropUrl = movie.backdropUrl
+            castMembers.clear()
+            castMembers.addAll(movie.cast)
+        }
     }
 
     LaunchedEffect(saveSuccess) {
@@ -76,7 +103,7 @@ fun AdminAddMovieScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Dodaj Film", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(if (movieId == null) "Dodaj Film" else "Edytuj Film", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
                         Text("Wypełnij wszystkie pola", color = Color.Gray, fontSize = 12.sp)
                     }
                 },
@@ -114,14 +141,25 @@ fun AdminAddMovieScreen(
                 }
 
                 // Sekcja: Plakaty i zdjęcia
-                AdminSection(title = "Plakaty i zdjęcia", icon = Icons.Default.ThumbUp) { // ThumbUp as placeholder for Plakaty
+                AdminSection(title = "Plakaty i zdjęcia", icon = Icons.Default.ThumbUp) {
                     Text("Plakat główny", color = Color.Gray, fontSize = 14.sp)
-                    ImagePickerBox(uri = posterUri, onClick = { posterLauncher.launch("image/*") }, label = "Kliknij aby dodać plakat")
+                    ImagePickerBox(
+                        uri = posterUri, 
+                        existingUrl = existingPosterUrl,
+                        onClick = { posterLauncher.launch("image/*") }, 
+                        label = "Kliknij aby dodać plakat"
+                    )
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     Text("Tło (backdrop)", color = Color.Gray, fontSize = 14.sp)
-                    ImagePickerBox(uri = backdropUri, onClick = { backdropLauncher.launch("image/*") }, label = "Kliknij aby dodać tło", height = 150.dp)
+                    ImagePickerBox(
+                        uri = backdropUri, 
+                        existingUrl = existingBackdropUrl,
+                        onClick = { backdropLauncher.launch("image/*") }, 
+                        label = "Kliknij aby dodać tło", 
+                        height = 150.dp
+                    )
                 }
 
                 // Sekcja: Obsada
@@ -171,6 +209,7 @@ fun AdminAddMovieScreen(
                 onClick = {
                     if (title.isNotBlank() && director.isNotBlank()) {
                         val movie = Movie(
+                            id = movieId ?: "",
                             title = title,
                             director = director,
                             year = year.toIntOrNull() ?: 2024,
@@ -178,8 +217,8 @@ fun AdminAddMovieScreen(
                             rating = rating.toDoubleOrNull() ?: 0.0,
                             genres = genre.split(",").map { it.trim() },
                             description = description,
-                            posterUrl = posterUri?.toString() ?: "",
-                            backdropUrl = backdropUri?.toString() ?: "",
+                            posterUrl = posterUri?.toString() ?: existingPosterUrl,
+                            backdropUrl = backdropUri?.toString() ?: existingBackdropUrl,
                             cast = castMembers.toList()
                         )
                         viewModel.saveMovie(movie)
@@ -254,7 +293,7 @@ fun AdminTextField(
 }
 
 @Composable
-fun ImagePickerBox(uri: Uri?, onClick: () -> Unit, label: String, height: androidx.compose.ui.unit.Dp = 200.dp) {
+fun ImagePickerBox(uri: Uri?, existingUrl: String = "", onClick: () -> Unit, label: String, height: androidx.compose.ui.unit.Dp = 200.dp) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -264,9 +303,9 @@ fun ImagePickerBox(uri: Uri?, onClick: () -> Unit, label: String, height: androi
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {
-        if (uri != null) {
+        if (uri != null || existingUrl.isNotEmpty()) {
             AsyncImage(
-                model = uri,
+                model = uri ?: existingUrl,
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop

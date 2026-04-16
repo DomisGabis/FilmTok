@@ -36,6 +36,19 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
         }
     }
 
+    private val _movieToEdit = MutableStateFlow<Movie?>(null)
+    val movieToEdit: StateFlow<Movie?> = _movieToEdit.asStateFlow()
+
+    fun loadMovie(movieId: String) {
+        viewModelScope.launch {
+            _movieToEdit.value = repository.getMovieDetails(movieId)
+        }
+    }
+
+    fun clearMovieToEdit() {
+        _movieToEdit.value = null
+    }
+
     fun saveMovie(movie: Movie) {
         viewModelScope.launch {
             _isSaving.value = true

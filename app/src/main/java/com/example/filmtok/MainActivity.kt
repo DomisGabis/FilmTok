@@ -38,12 +38,24 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
-                val bottomBarItems = listOf(
-                    Screen.Home,
-                    Screen.Reels,
-                    Screen.Search,
-                    Screen.Profile
-                )
+                val bottomBarItems = remember(userRole) {
+                    if (userRole == "admin") {
+                        listOf(
+                            Screen.Home,
+                            Screen.Reels,
+                            Screen.Search,
+                            Screen.AdminDashboard,
+                            Screen.Profile
+                        )
+                    } else {
+                        listOf(
+                            Screen.Home,
+                            Screen.Reels,
+                            Screen.Search,
+                            Screen.Profile
+                        )
+                    }
+                }
 
                 val showBottomBar = bottomBarItems.any { it.route == currentDestination?.route }
 
@@ -94,7 +106,16 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                         
-                        composable(Screen.Register.route) { PlaceholderScreen("Rejestracja") }
+                        composable(Screen.Register.route) {
+                            RegisterScreen(
+                                onRegisterSuccess = {
+                                    navController.navigate(Screen.Home.route) {
+                                        popUpTo(Screen.Login.route) { inclusive = true }
+                                    }
+                                },
+                                onNavigateToLogin = { navController.popBackStack() }
+                            )
+                        }
 
                         composable(Screen.Home.route) {
                             HomeScreen(onMovieClick = { movieId ->
@@ -108,9 +129,20 @@ class MainActivity : ComponentActivity() {
                             })
                         }
                         
-                        composable(Screen.Search.route) { PlaceholderScreen("Szukaj") }
+                        composable(Screen.Search.route) {
+                            SearchScreen(onMovieClick = { movieId ->
+                                navController.navigate(Screen.MovieDetails.createRoute(movieId))
+                            })
+                        }
                         
-                        composable(Screen.Profile.route) { UserProfileScreen() }
+                        composable(Screen.Profile.route) {
+                            UserProfileScreen(onLogout = {
+                                authViewModel.signOut()
+                                navController.navigate(Screen.Login.route) {
+                                    popUpTo(0)
+                                }
+                            })
+                        }
 
                         composable(Screen.AdminDashboard.route) {
                             AdminDashboardScreen(
@@ -122,14 +154,21 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate(Screen.AdminAddMovie.route)
                                 },
                                 onNavigateToEditMovie = { movieId ->
-                                    // Tutaj można dodać nawigację do edycji, używając tego samego ekranu co dodawanie
-                                    // Ale na razie przekierujmy do dodawania lub zróbmy placeholder
+                                    navController.navigate(Screen.AdminAddMovie.createRoute(movieId))
                                 }
                             )
                         }
 
-                        composable(Screen.AdminAddMovie.route) {
+                        composable(
+                            route = Screen.AdminAddMovie.route,
+                            arguments = listOf(navArgument("movieId") { 
+                                nullable = true
+                                type = NavType.StringType 
+                            })
+                        ) { backStackEntry ->
+                            val movieId = backStackEntry.arguments?.getString("movieId")
                             AdminAddMovieScreen(
+                                movieId = movieId,
                                 onBackClick = { navController.popBackStack() }
                             )
                         }

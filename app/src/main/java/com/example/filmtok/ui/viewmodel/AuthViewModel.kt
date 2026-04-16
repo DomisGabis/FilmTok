@@ -29,15 +29,59 @@ class AuthViewModel : ViewModel() {
             _isLoading.value = true
             try {
                 val document = db.collection("users").document(uid).get().await()
-                val user = document.toObject(User::class.java)
-                if (user?.isAdmin == true) {
-                    _userRole.value = "admin"
+                if (document.exists()) {
+                    val isAdmin = document.getBoolean("isAdmin") ?: false
+                    _userRole.value = if (isAdmin) "admin" else "user"
                 } else {
+                    // Jeśli dokumentu nie ma, stwórzmy go jako zwykły użytkownik
+                    val newUser = mapOf("uid" to uid, "isAdmin" to false, "email" to auth.currentUser?.email)
+                    db.collection("users").document(uid).set(newUser).await()
                     _userRole.value = "user"
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Błąd pobierania roli: ${e.message}"
-                _userRole.value = "user" // Default to user on error
+                _userRole.value = "user"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun register(email: String, pass: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val result = auth.createUserWithEmailAndPassword(email, pass).await()
+                val uid = result.user?.uid ?: return@launch
+                
+                // Tworzymy dokument w Firestore dla nowego usera
+                val userMetadata = mapOf(
+                    "uid" to uid,
+                    "email" to email,
+                    "isAdmin" to false // Domyślnie każdy jest zwykłym userem
+                )
+                db.collection("users").document(uid).set(userMetadata).await()
+                
+                _userRole.value = "user"
+            } catch (e: Exception) {
+                _errorMessage.value = "Błąd rejestracji: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun signIn(email: String, pass: String) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _errorMessage.value = null
+            try {
+                val result = auth.signInWithEmailAndPassword(email, pass).await()
+                val uid = result.user?.uid ?: return@launch
+                checkUserRole(uid)
+            } catch (e: Exception) {
+                _errorMessage.value = "Błąd logowania: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
@@ -47,5 +91,9 @@ class AuthViewModel : ViewModel() {
     fun signOut() {
         auth.signOut()
         _userRole.value = null
+    }
+
+    fun setErrorMessage(message: String?) {
+        _errorMessage.value = message
     }
 }
