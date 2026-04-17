@@ -13,3 +13,15 @@
 .externalNativeBuild
 .cxx
 local.properties
+.idea/
+.gradle/
+captures/
+.externalNativeBuild/
+.cxx/
+build/
+app/build/
+*.log
+.DS_Store
+Thumbs.db
+.vscode/
+*.code-workspace

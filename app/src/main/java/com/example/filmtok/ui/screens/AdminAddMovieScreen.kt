@@ -16,18 +16,21 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.filmtok.model.CastMember
-import com.example.filmtok.model.Movie
+import com.example.filmtok.ui.viewmodel.AdminMovieFormState
 import com.example.filmtok.ui.viewmodel.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,34 +40,16 @@ fun AdminAddMovieScreen(
     movieId: String? = null,
     viewModel: AdminViewModel = viewModel()
 ) {
-    var title by remember { mutableStateOf("") }
-    var director by remember { mutableStateOf("") }
-    var year by remember { mutableStateOf("") }
-    var duration by remember { mutableStateOf("") }
-    var rating by remember { mutableStateOf("") }
-    var genre by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
-    
-    var posterUri by remember { mutableStateOf<Uri?>(null) }
-    var backdropUri by remember { mutableStateOf<Uri?>(null) }
-    var existingPosterUrl by remember { mutableStateOf("") }
-    var existingBackdropUrl by remember { mutableStateOf("") }
-    
-    // Obsada
-    var actorName by remember { mutableStateOf("") }
-    var actorRole by remember { mutableStateOf("") }
-    var actorImageUrl by remember { mutableStateOf("") }
-    val castMembers = remember { mutableStateListOf<CastMember>() }
-
-    val isSaving by viewModel.isSaving.collectAsState()
-    val saveSuccess by viewModel.saveSuccess.collectAsState()
-    val movieToEdit by viewModel.movieToEdit.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val saveSuccess by viewModel.saveSuccess.collectAsStateWithLifecycle()
+    val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
     val posterLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        posterUri = uri
+        viewModel.onPosterUriChange(uri)
     }
     val backdropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-        backdropUri = uri
+        viewModel.onBackdropUriChange(uri)
     }
 
     LaunchedEffect(movieId) {
@@ -72,22 +57,6 @@ fun AdminAddMovieScreen(
             viewModel.loadMovie(movieId)
         } else {
             viewModel.clearMovieToEdit()
-        }
-    }
-
-    LaunchedEffect(movieToEdit) {
-        movieToEdit?.let { movie ->
-            title = movie.title
-            director = movie.director
-            year = movie.year.toString()
-            duration = movie.duration
-            rating = movie.rating.toString()
-            genre = movie.genres.joinToString(", ")
-            description = movie.description
-            existingPosterUrl = movie.posterUrl
-            existingBackdropUrl = movie.backdropUrl
-            castMembers.clear()
-            castMembers.addAll(movie.cast)
         }
     }
 
@@ -100,19 +69,9 @@ fun AdminAddMovieScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(if (movieId == null) "Dodaj Film" else "Edytuj Film", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                        Text("Wypełnij wszystkie pola", color = Color.Gray, fontSize = 12.sp)
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+            AdminTopBar(
+                isEditMode = movieId != null,
+                onBackClick = onBackClick
             )
         },
         containerColor = Color.Black
@@ -125,120 +84,210 @@ fun AdminAddMovieScreen(
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                // Sekcja: Podstawowe informacje
-                AdminSection(title = "Podstawowe informacje", icon = Icons.Default.Info) {
-                    AdminTextField(value = title, onValueChange = { title = it }, label = "Tytuł *", placeholder = "Np. Matrix")
-                    AdminTextField(value = director, onValueChange = { director = it }, label = "Reżyser *", placeholder = "Lana Wachowski")
-                    
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        AdminTextField(modifier = Modifier.weight(1f), value = year, onValueChange = { year = it }, label = "Rok produkcji", placeholder = "2024")
-                        AdminTextField(modifier = Modifier.weight(1f), value = duration, onValueChange = { duration = it }, label = "Czas trwania (min)", placeholder = "120")
-                    }
-                    
-                    AdminTextField(value = rating, onValueChange = { rating = it }, label = "Ocena (0-5)", placeholder = "5")
-                    AdminTextField(value = genre, onValueChange = { genre = it }, label = "Gatunek", placeholder = "Sci-Fi, Akcja")
-                    AdminTextField(value = description, onValueChange = { description = it }, label = "Opis", placeholder = "Krótki opis filmu...", minLines = 3)
-                }
-
-                // Sekcja: Plakaty i zdjęcia
-                AdminSection(title = "Plakaty i zdjęcia", icon = Icons.Default.ThumbUp) {
-                    Text("Plakat główny", color = Color.Gray, fontSize = 14.sp)
-                    ImagePickerBox(
-                        uri = posterUri, 
-                        existingUrl = existingPosterUrl,
-                        onClick = { posterLauncher.launch("image/*") }, 
-                        label = "Kliknij aby dodać plakat"
-                    )
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    Text("Tło (backdrop)", color = Color.Gray, fontSize = 14.sp)
-                    ImagePickerBox(
-                        uri = backdropUri, 
-                        existingUrl = existingBackdropUrl,
-                        onClick = { backdropLauncher.launch("image/*") }, 
-                        label = "Kliknij aby dodać tło", 
-                        height = 150.dp
+                if (errorMessage != null) {
+                    Text(
+                        text = errorMessage!!,
+                        color = Color.Red,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
 
-                // Sekcja: Obsada
-                AdminSection(title = "Obsada", icon = Icons.Default.Person) {
-                    AdminTextField(value = actorName, onValueChange = { actorName = it }, label = "Imię i nazwisko aktora")
-                    AdminTextField(value = actorRole, onValueChange = { actorRole = it }, label = "Rola w filmie")
-                    AdminTextField(value = actorImageUrl, onValueChange = { actorImageUrl = it }, label = "URL zdjęcia aktora (opcjonalnie)")
-                    
-                    Button(
-                        onClick = {
-                            if (actorName.isNotBlank() && actorRole.isNotBlank()) {
-                                castMembers.add(CastMember(name = actorName, character = actorRole, imageUrl = actorImageUrl))
-                                actorName = ""
-                                actorRole = ""
-                                actorImageUrl = ""
-                            }
-                        },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.1f)),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Icon(Icons.Default.Add, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Dodaj aktora")
-                    }
+                BasicInfoSection(uiState = uiState, viewModel = viewModel)
 
-                    // Lista dodanych aktorów
-                    castMembers.forEach { member ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text("${member.name} jako ${member.character}", color = Color.White, fontSize = 14.sp)
-                            IconButton(onClick = { castMembers.remove(member) }) {
-                                Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red, modifier = Modifier.size(20.dp))
-                            }
-                        }
-                    }
-                }
+                ImagesSection(
+                    uiState = uiState,
+                    onPosterClick = { posterLauncher.launch("image/*") },
+                    onBackdropClick = { backdropLauncher.launch("image/*") }
+                )
+
+                CastSection(uiState = uiState, viewModel = viewModel)
 
                 Spacer(modifier = Modifier.height(80.dp))
             }
 
-            // Przycisk Zapisz
-            Button(
-                onClick = {
-                    if (title.isNotBlank() && director.isNotBlank()) {
-                        val movie = Movie(
-                            id = movieId ?: "",
-                            title = title,
-                            director = director,
-                            year = year.toIntOrNull() ?: 2024,
-                            duration = duration,
-                            rating = rating.toDoubleOrNull() ?: 0.0,
-                            genres = genre.split(",").map { it.trim() },
-                            description = description,
-                            posterUrl = posterUri?.toString() ?: existingPosterUrl,
-                            backdropUrl = backdropUri?.toString() ?: existingBackdropUrl,
-                            cast = castMembers.toList()
-                        )
-                        viewModel.saveMovie(movie)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF2D55)),
-                shape = RoundedCornerShape(28.dp),
-                enabled = !isSaving
-            ) {
-                if (isSaving) {
-                    CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-                } else {
-                    Text("Zapisz", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
+            SaveButton(
+                isLoading = isLoading,
+                onClick = { viewModel.saveMovie(movieId) },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AdminTopBar(isEditMode: Boolean, onBackClick: () -> Unit) {
+    TopAppBar(
+        title = {
+            Column {
+                Text(
+                    text = if (isEditMode) "Edytuj Film" else "Dodaj Film",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text("Wypełnij wszystkie pola", color = Color.Gray, fontSize = 12.sp)
             }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
+            }
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+    )
+}
+
+@Composable
+fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
+    AdminSection(title = "Podstawowe informacje", icon = Icons.Default.Info) {
+        AdminTextField(
+            value = uiState.title,
+            onValueChange = viewModel::onTitleChange,
+            label = "Tytuł *",
+            placeholder = "Np. Matrix"
+        )
+        AdminTextField(
+            value = uiState.director,
+            onValueChange = viewModel::onDirectorChange,
+            label = "Reżyser *",
+            placeholder = "Lana Wachowski"
+        )
+        
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            AdminTextField(
+                modifier = Modifier.weight(1f),
+                value = uiState.year,
+                onValueChange = viewModel::onYearChange,
+                label = "Rok produkcji",
+                placeholder = "2024"
+            )
+            AdminTextField(
+                modifier = Modifier.weight(1f),
+                value = uiState.duration,
+                onValueChange = viewModel::onDurationChange,
+                label = "Czas trwania (min)",
+                placeholder = "120"
+            )
+        }
+        
+        AdminTextField(
+            value = uiState.rating,
+            onValueChange = viewModel::onRatingChange,
+            label = "Ocena (0-5)",
+            placeholder = "5"
+        )
+        AdminTextField(
+            value = uiState.genre,
+            onValueChange = viewModel::onGenreChange,
+            label = "Gatunek",
+            placeholder = "Sci-Fi, Akcja"
+        )
+        AdminTextField(
+            value = uiState.description,
+            onValueChange = viewModel::onDescriptionChange,
+            label = "Opis",
+            placeholder = "Krótki opis filmu...",
+            minLines = 3
+        )
+    }
+}
+
+@Composable
+fun ImagesSection(
+    uiState: AdminMovieFormState,
+    onPosterClick: () -> Unit,
+    onBackdropClick: () -> Unit
+) {
+    AdminSection(title = "Plakaty i zdjęcia", icon = Icons.Default.ThumbUp) {
+        Text("Plakat główny", color = Color.Gray, fontSize = 14.sp)
+        ImagePickerBox(
+            uri = uiState.posterUri, 
+            existingUrl = uiState.existingPosterUrl,
+            onClick = onPosterClick, 
+            label = "Kliknij aby dodać plakat"
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        Text("Tło (backdrop)", color = Color.Gray, fontSize = 14.sp)
+        ImagePickerBox(
+            uri = uiState.backdropUri, 
+            existingUrl = uiState.existingBackdropUrl,
+            onClick = onBackdropClick, 
+            label = "Kliknij aby dodać tło", 
+            height = 150.dp
+        )
+    }
+}
+
+@Composable
+fun CastSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
+    AdminSection(title = "Obsada", icon = Icons.Default.Person) {
+        AdminTextField(
+            value = uiState.actorName,
+            onValueChange = viewModel::onActorNameChange,
+            label = "Imię i nazwisko aktora"
+        )
+        AdminTextField(
+            value = uiState.actorRole,
+            onValueChange = viewModel::onActorRoleChange,
+            label = "Rola w filmie"
+        )
+        AdminTextField(
+            value = uiState.actorImageUrl,
+            onValueChange = viewModel::onActorImageUrlChange,
+            label = "URL zdjęcia aktora (opcjonalnie)"
+        )
+        
+        Button(
+            onClick = viewModel::addCastMember,
+            modifier = Modifier.fillMaxWidth(),
+            colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.1f)),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Icon(Icons.Default.Add, contentDescription = null)
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Dodaj aktora")
+        }
+
+        uiState.castMembers.forEach { member ->
+            CastMemberItem(member = member, onRemove = { viewModel.removeCastMember(member) })
+        }
+    }
+}
+
+@Composable
+fun CastMemberItem(member: CastMember, onRemove: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("${member.name} jako ${member.character}", color = Color.White, fontSize = 14.sp)
+        IconButton(onClick = onRemove) {
+            Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red, modifier = Modifier.size(20.dp))
+        }
+    }
+}
+
+@Composable
+fun SaveButton(isLoading: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
+    Button(
+        onClick = onClick,
+        modifier = modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(56.dp),
+        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF2D55)),
+        shape = RoundedCornerShape(28.dp),
+        enabled = !isLoading
+    ) {
+        if (isLoading) {
+            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+        } else {
+            Text("Zapisz", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -293,7 +342,14 @@ fun AdminTextField(
 }
 
 @Composable
-fun ImagePickerBox(uri: Uri?, existingUrl: String = "", onClick: () -> Unit, label: String, height: androidx.compose.ui.unit.Dp = 200.dp) {
+fun ImagePickerBox(
+    uri: Uri?, 
+    existingUrl: String = "", 
+    onClick: () -> Unit, 
+    label: String, 
+    height: Dp = 200.dp
+) {
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -305,7 +361,10 @@ fun ImagePickerBox(uri: Uri?, existingUrl: String = "", onClick: () -> Unit, lab
     ) {
         if (uri != null || existingUrl.isNotEmpty()) {
             AsyncImage(
-                model = uri ?: existingUrl,
+                model = ImageRequest.Builder(context)
+                    .data(uri ?: existingUrl)
+                    .crossfade(true)
+                    .build(),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
