@@ -31,6 +31,13 @@ fun AdminDashboardScreen(
     viewModel: AdminViewModel = viewModel()
 ) {
     val movies by viewModel.movies.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    // Pobieramy dane tylko gdy wchodzimy na ten ekran
+    LaunchedEffect(Unit) {
+        viewModel.loadMovies()
+    }
 
     Scaffold(
         topBar = {
@@ -71,24 +78,44 @@ fun AdminDashboardScreen(
         },
         containerColor = Color.Black
     ) { padding ->
-        if (movies.isEmpty()) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = Color(0xFFFF2D55))
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(movies) { movie ->
-                    MovieAdminItem(
-                        movie = movie,
-                        onEdit = { onNavigateToEditMovie(movie.id) },
-                        onDelete = { viewModel.deleteMovie(movie.id) }
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            when {
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center),
+                        color = Color(0xFFFF2D55)
                     )
+                }
+                errorMessage != null -> {
+                    Text(
+                        text = errorMessage ?: "Wystąpił błąd",
+                        color = Color.Gray,
+                        modifier = Modifier.align(Alignment.Center),
+                        fontSize = 14.sp
+                    )
+                }
+                movies.isEmpty() -> {
+                    Text(
+                        text = "Brak filmów w bazie",
+                        color = Color.Gray,
+                        modifier = Modifier.align(Alignment.Center),
+                        fontSize = 14.sp
+                    )
+                }
+                else -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(movies) { movie ->
+                            MovieAdminItem(
+                                movie = movie,
+                                onEdit = { onNavigateToEditMovie(movie.id) },
+                                onDelete = { viewModel.deleteMovie(movie.id) }
+                            )
+                        }
+                    }
                 }
             }
         }
