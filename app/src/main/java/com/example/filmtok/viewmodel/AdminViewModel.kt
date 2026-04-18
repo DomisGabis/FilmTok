@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filmtok.data.MovieRepository
+import com.example.filmtok.data.StorageRepository
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,20 +23,28 @@ data class AdminMovieFormState(
     val description: String = "",
     val posterUri: Uri? = null,
     val backdropUri: Uri? = null,
+    val videoUri: Uri? = null,
     val existingPosterUrl: String = "",
     val existingBackdropUrl: String = "",
+    val existingVideoUrl: String = "",
     val castMembers: List<CastMember> = emptyList(),
     val actorName: String = "",
     val actorRole: String = "",
     val actorImageUrl: String = ""
 )
 
-class AdminViewModel(private val repository: MovieRepository = MovieRepository()) : ViewModel() {
+class AdminViewModel(
+    private val repository: MovieRepository = MovieRepository(),
+    private val storageRepository: StorageRepository = StorageRepository()
+) : ViewModel() {
     private val _movies = MutableStateFlow<List<Movie>>(emptyList())
     val movies: StateFlow<List<Movie>> = _movies.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    private val _uploadProgress = MutableStateFlow(0f)
+    val uploadProgress: StateFlow<Float> = _uploadProgress.asStateFlow()
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage.asStateFlow()
@@ -86,7 +95,6 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
                 val movie = repository.getMovieDetails(movieId)
 
                 if (movie != null) {
-                    // Teraz Kotlin wie, że movie nie jest nullem
                     _uiState.update {
                         it.copy(
                             title = movie.title,
@@ -98,6 +106,7 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
                             description = movie.description,
                             existingPosterUrl = movie.posterUrl,
                             existingBackdropUrl = movie.backdropUrl,
+                            existingVideoUrl = movie.videoUrl,
                             castMembers = movie.cast
                         )
                     }
@@ -115,6 +124,7 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
     fun clearMovieToEdit() {
         _uiState.value = AdminMovieFormState()
         _errorMessage.value = null
+        _uploadProgress.value = 0f
     }
 
     fun onTitleChange(value: String) = _uiState.update { it.copy(title = value) }
@@ -126,6 +136,7 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
     fun onDescriptionChange(value: String) = _uiState.update { it.copy(description = value) }
     fun onPosterUriChange(uri: Uri?) = _uiState.update { it.copy(posterUri = uri) }
     fun onBackdropUriChange(uri: Uri?) = _uiState.update { it.copy(backdropUri = uri) }
+    fun onVideoUriChange(uri: Uri?) = _uiState.update { it.copy(videoUri = uri) }
     fun onActorNameChange(value: String) = _uiState.update { it.copy(actorName = value) }
     fun onActorRoleChange(value: String) = _uiState.update { it.copy(actorRole = value) }
     fun onActorImageUrlChange(value: String) = _uiState.update { it.copy(actorImageUrl = value) }
@@ -160,9 +171,33 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
         viewModelScope.launch {
             _isLoading.value = true
             _errorMessage.value = null
+            _uploadProgress.value = 0f
             try {
+                val id = movieId ?: repository.getNewId()
+                
+                var posterUrl = state.existingPosterUrl
+                if (state.posterUri != null) {
+                    posterUrl = storageRepository.uploadImage(state.posterUri, "movies/$id/poster.jpg") {
+                        _uploadProgress.value = it * 0.33f
+                    }
+                }
+
+                var backdropUrl = state.existingBackdropUrl
+                if (state.backdropUri != null) {
+                    backdropUrl = storageRepository.uploadImage(state.backdropUri, "movies/$id/backdrop.jpg") {
+                        _uploadProgress.value = 0.33f + (it * 0.33f)
+                    }
+                }
+
+                var videoUrl = state.existingVideoUrl
+                if (state.videoUri != null) {
+                    videoUrl = storageRepository.uploadVideo(state.videoUri, "movies/$id/video.mp4") {
+                        _uploadProgress.value = 0.66f + (it * 0.34f)
+                    }
+                }
+
                 val movie = Movie(
-                    id = movieId ?: "",
+                    id = id,
                     title = state.title,
                     director = state.director,
                     year = state.year.toIntOrNull() ?: 2024,
@@ -170,11 +205,14 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
                     rating = state.rating.toDoubleOrNull() ?: 0.0,
                     genres = state.genre.split(",").map { it.trim() },
                     description = state.description,
-                    posterUrl = state.posterUri?.toString() ?: state.existingPosterUrl,
-                    backdropUrl = state.backdropUri?.toString() ?: state.existingBackdropUrl,
-                    cast = state.castMembers
+                    posterUrl = posterUrl,
+                    backdropUrl = backdropUrl,
+                    videoUrl = videoUrl,
+                    cast = state.castMembers,
+                    hasVideo = videoUrl.isNotEmpty()
                 )
                 repository.saveMovie(movie)
+                _uploadProgress.value = 1f
                 _saveSuccess.value = true
             } catch (e: Exception) {
                 _errorMessage.value = "Błąd zapisu: ${e.message}"

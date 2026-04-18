@@ -69,6 +69,8 @@ class MovieRepository {
         }
     }
 
+    fun getNewId(): String = moviesCollection.document().id
+
     suspend fun deleteMovie(movieId: String) {
         moviesCollection.document(movieId).delete().await()
     }
