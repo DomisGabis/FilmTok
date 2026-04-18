@@ -8,6 +8,8 @@ import com.example.filmtok.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
@@ -35,10 +37,19 @@ class HomeViewModel(
                 val hero = repository.getHeroMovie()
                 val recently = repository.getRecentlyWatched()
                 
-                _heroMovie.value = hero?.let { storageRepository.resolveMovieUrls(it) }
-                _recentlyWatched.value = recently.map { storageRepository.resolveMovieUrls(it) }
+                // Fallback do pierwszego filmu, jeśli żaden nie jest oznaczony jako Hero
+                val finalHero = hero ?: recently.firstOrNull()
+                
+                _heroMovie.value = finalHero?.let { storageRepository.resolveMovieUrls(it) }
+                
+                // Poprawne rozwiązanie URLi dla listy filmów
+                val resolvedRecently = recently.map { movie ->
+                    async { storageRepository.resolveMovieUrls(movie) }
+                }.awaitAll()
+                
+                _recentlyWatched.value = resolvedRecently
             } catch (e: Exception) {
-                // Obsługa błędów
+                e.printStackTrace()
             } finally {
                 _isLoading.value = false
             }
