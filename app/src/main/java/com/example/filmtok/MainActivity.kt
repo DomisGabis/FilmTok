@@ -186,12 +186,15 @@ class MainActivity : ComponentActivity() {
                     }
 
                     LaunchedEffect(userRole) {
-                        when (userRole) {
-                            "admin" -> navController.navigate(Screen.AdminDashboard.route) {
-                                popUpTo(Screen.Login.route) { inclusive = true }
-                            }
-                            "user" -> navController.navigate(Screen.Home.route) {
-                                popUpTo(Screen.Login.route) { inclusive = true }
+                        val currentRoute = navController.currentDestination?.route
+                        if (currentRoute == Screen.Login.route || currentRoute == null) {
+                            when (userRole) {
+                                "admin" -> navController.navigate(Screen.AdminDashboard.route) {
+                                    popUpTo(Screen.Login.route) { inclusive = true }
+                                }
+                                "user" -> navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.Login.route) { inclusive = true }
+                                }
                             }
                         }
                     }
