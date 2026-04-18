@@ -36,7 +36,9 @@ class MainActivity : ComponentActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
-            FilmTokTheme {
+            var isDarkMode by remember { mutableStateOf(true) }
+
+            FilmTokTheme(darkTheme = isDarkMode) {
                 val authViewModel: AuthViewModel = viewModel()
                 val userRole by authViewModel.userRole.collectAsState()
                 val navController = rememberNavController()
@@ -68,8 +70,8 @@ class MainActivity : ComponentActivity() {
                     bottomBar = {
                         if (showBottomBar) {
                             NavigationBar(
-                                containerColor = Color.Black,
-                                contentColor = Color.White
+                                containerColor = MaterialTheme.colorScheme.surface,
+                                contentColor = MaterialTheme.colorScheme.onSurface
                             ) {
                                 bottomBarItems.forEach { screen ->
                                     val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
@@ -87,8 +89,8 @@ class MainActivity : ComponentActivity() {
                                             }
                                         },
                                         colors = NavigationBarItemDefaults.colors(
-                                            selectedIconColor = Color(0xFFFF2D55),
-                                            selectedTextColor = Color(0xFFFF2D55),
+                                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                                            selectedTextColor = MaterialTheme.colorScheme.primary,
                                             unselectedIconColor = Color.Gray,
                                             unselectedTextColor = Color.Gray,
                                             indicatorColor = Color.Transparent
@@ -141,12 +143,16 @@ class MainActivity : ComponentActivity() {
                         }
                         
                         composable(Screen.Profile.route) {
-                            UserProfileScreen(onLogout = {
-                                authViewModel.signOut()
-                                navController.navigate(Screen.Login.route) {
-                                    popUpTo(0)
+                            UserProfileScreen(
+                                isDarkMode = isDarkMode,
+                                onDarkModeChange = { isDarkMode = it },
+                                onLogout = {
+                                    authViewModel.signOut()
+                                    navController.navigate(Screen.Login.route) {
+                                        popUpTo(0)
+                                    }
                                 }
-                            })
+                            )
                         }
 
                         composable(Screen.AdminDashboard.route) {

@@ -44,7 +44,7 @@ fun MovieDetailsScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.Black
+        color = MaterialTheme.colorScheme.background
     ) {
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -88,7 +88,7 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit) {
                 .fillMaxSize()
                 .background(
                     Brush.verticalGradient(
-                        colors = listOf(Color.Transparent, Color.Black),
+                        colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background),
                         startY = 400f
                     )
                 )
@@ -128,14 +128,14 @@ fun MovieInfoSection(movie: Movie) {
             movie.genres.forEach { genre ->
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = Color.DarkGray.copy(alpha = 0.5f),
+                    color = MaterialTheme.colorScheme.surface,
                     modifier = Modifier.padding(end = 8.dp)
                 ) {
                     Text(
                         text = genre,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.labelSmall,
-                        color = Color.LightGray
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -145,7 +145,7 @@ fun MovieInfoSection(movie: Movie) {
             text = movie.title,
             style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -166,7 +166,7 @@ fun DescriptionSection(description: String) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = description,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = if (isExpanded) Int.MAX_VALUE else 3,
             overflow = TextOverflow.Ellipsis,
@@ -184,7 +184,7 @@ fun GallerySection(images: List<String>) {
             Text(
                 text = "Galeria Ultra-HD",
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(16.dp)
             )
             LazyRow(
@@ -213,7 +213,7 @@ fun CastSection(cast: List<CastMember>) {
         Text(
             text = "Obsada",
             style = MaterialTheme.typography.titleMedium,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(16.dp)
         )
         LazyRow(
@@ -237,7 +237,7 @@ fun CastSection(cast: List<CastMember>) {
                     Text(
                         text = member.name,
                         style = MaterialTheme.typography.labelMedium,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         maxLines = 2,
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center
                     )

@@ -1,7 +1,6 @@
 package com.example.filmtok.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -15,13 +14,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -32,53 +30,62 @@ import com.example.filmtok.viewmodel.ProfileViewModel
 
 @Composable
 fun UserProfileScreen(
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit,
     onLogout: () -> Unit,
     viewModel: ProfileViewModel = viewModel()
 ) {
     val user by viewModel.user.collectAsState()
     val scrollState = rememberScrollState()
 
-    user?.let { currentUser ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .verticalScroll(scrollState)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            ProfileHeader(currentUser)
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            StatsGrid(currentUser)
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            SectionHeader(title = "Ulubione gatunki", icon = Icons.Default.Menu)
-            Spacer(modifier = Modifier.height(12.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        user?.let { currentUser ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(scrollState)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(currentUser.favoriteGenres) { genre ->
-                    GenreChip(genre)
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                ProfileHeader(currentUser)
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                StatsGrid(currentUser)
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                SectionHeader(title = "Ulubione gatunki", icon = Icons.Default.Menu)
+                Spacer(modifier = Modifier.height(12.dp))
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    items(currentUser.favoriteGenres) { genre ->
+                        GenreChip(genre)
+                    }
                 }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                SectionHeader(title = "Osiągnięcia", icon = Icons.Default.Star)
+                Spacer(modifier = Modifier.height(12.dp))
+                AchievementsList(currentUser.achievements)
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                SettingsSection(
+                    isDarkMode = isDarkMode,
+                    onDarkModeChange = onDarkModeChange,
+                    onLogout = onLogout
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
             }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            SectionHeader(title = "Osiągnięcia", icon = Icons.Default.Star)
-            Spacer(modifier = Modifier.height(12.dp))
-            AchievementsList(currentUser.achievements)
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            SettingsSection(onLogout = onLogout)
-            
-            Spacer(modifier = Modifier.height(32.dp))
+        } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
     }
 }
@@ -86,192 +93,161 @@ fun UserProfileScreen(
 @Composable
 fun ProfileHeader(user: User) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Box {
+        Box(
+            modifier = Modifier
+                .size(120.dp)
+                .clip(CircleShape)
+                .background(
+                    Brush.linearGradient(
+                        colors = listOf(Color(0xFFFF2D55), Color(0xFF00F2EA))
+                    )
+                )
+                .padding(4.dp)
+        ) {
             AsyncImage(
                 model = user.profileImageUrl,
                 contentDescription = "Profile Picture",
                 modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .border(2.dp, Color(0xFFFF2D55), CircleShape),
+                    .fillMaxSize()
+                    .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .background(Color(0xFFFF2D55), CircleShape)
-                    .padding(6.dp)
-            ) {
-                Icon(Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color.White)
-            }
         }
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Text(text = user.name, color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-        Surface(
-            color = Color.DarkGray,
-            shape = RoundedCornerShape(4.dp),
-            modifier = Modifier.padding(vertical = 4.dp)
-        ) {
-            Text(
-                text = "USER",
-                color = Color.LightGray,
-                fontSize = 10.sp,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-            )
-        }
+        Text(
+            text = user.username,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
         
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Button(
-                onClick = { },
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF2D55)),
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Icon(Icons.Default.Share, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Udostępnij profil")
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            IconButton(
-                onClick = { },
-                modifier = Modifier.background(Color.DarkGray.copy(alpha = 0.5f), CircleShape)
-            ) {
-                Icon(Icons.Default.Notifications, contentDescription = null, tint = Color.White)
-            }
-        }
+        Text(
+            text = user.name, // Używamy 'name' zamiast 'email' jeśli w modelu nie ma email
+            color = Color.Gray,
+            fontSize = 14.sp
+        )
     }
 }
 
 @Composable
 fun StatsGrid(user: User) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(modifier = Modifier.weight(1f), icon = Icons.Default.List, value = user.stats.moviesInBase.toString(), label = "Filmów w bazie")
-            StatCard(modifier = Modifier.weight(1f), icon = Icons.Default.Star, value = user.stats.averageRating.toString(), label = "Średnia ocena")
-        }
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            StatCard(modifier = Modifier.weight(1f), icon = Icons.Default.PlayArrow, value = "${user.stats.watchTimeHours}h", label = "Czas oglądania")
-            StatCard(modifier = Modifier.weight(1f), icon = Icons.Default.FavoriteBorder, value = user.stats.moviesWatched.toString(), label = "Obejrzane")
-        }
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        StatCard(Modifier.weight(1f), Icons.Default.Favorite, user.stats.moviesInBase.toString(), "Filmy")
+        StatCard(Modifier.weight(1f), Icons.Default.PlayArrow, user.stats.moviesWatched.toString(), "Obejrzane")
+        StatCard(Modifier.weight(1f), Icons.Default.Star, user.stats.averageRating.toString(), "Ocena")
     }
 }
 
 @Composable
-fun StatCard(modifier: Modifier = Modifier, icon: ImageVector, value: String, label: String) {
-    Surface(
+fun StatCard(modifier: Modifier, icon: ImageVector, value: String, label: String) {
+    Column(
         modifier = modifier,
-        color = Color(0xFF1E1E1E),
-        shape = RoundedCornerShape(16.dp)
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(icon, contentDescription = null, tint = Color(0xFFFF2D55), modifier = Modifier.size(24.dp))
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = value, color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(text = label, color = Color.Gray, fontSize = 12.sp)
-        }
+        Icon(icon, contentDescription = null, tint = Color(0xFFFF2D55), modifier = Modifier.size(24.dp))
+        Text(text = value, color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        Text(text = label, color = Color.Gray, fontSize = 12.sp)
     }
 }
 
 @Composable
 fun SectionHeader(title: String, icon: ImageVector) {
-    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-        Icon(icon, contentDescription = null, tint = Color(0xFF00BFFF), modifier = Modifier.size(20.dp))
+    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Icon(icon, contentDescription = null, tint = Color(0xFF00F2EA), modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(text = title, color = MaterialTheme.colorScheme.onBackground, fontSize = 18.sp, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
 fun GenreChip(genre: String) {
-    val backgroundColor = when(genre) {
-        "Sci-Fi" -> Color(0xFFFF2D55)
-        "Action" -> Color(0xFF00BFFF)
-        "Drama" -> Color(0xFFFFD700)
-        else -> Color.DarkGray
-    }
     Surface(
-        color = backgroundColor,
-        shape = RoundedCornerShape(16.dp)
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(20.dp),
+        border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray.copy(alpha = 0.3f))
     ) {
         Text(
             text = genre,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp
+            fontSize = 14.sp
         )
     }
 }
 
 @Composable
 fun AchievementsList(achievements: List<Achievement>) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         achievements.forEach { achievement ->
-            AchievementItem(modifier = Modifier.weight(1f), achievement = achievement)
-        }
-    }
-}
-
-@Composable
-fun AchievementItem(modifier: Modifier = Modifier, achievement: Achievement) {
-    val icon = when(achievement.iconName) {
-        "Movie" -> Icons.Default.PlayArrow
-        "Star" -> Icons.Default.Star
-        "Timer" -> Icons.Default.Build // Placeholder for Timer
-        else -> Icons.Default.Info
-    }
-
-    Surface(
-        modifier = modifier,
-        color = Color(0xFF1E1E1E),
-        shape = RoundedCornerShape(16.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(12.dp)
-                .alpha(if (achievement.isUnlocked) 1f else 0.4f),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(Color(achievement.color).copy(alpha = 0.2f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = Color(achievement.color),
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = achievement.title,
-                color = Color.White,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-                maxLines = 1
+            AchievementItem(
+                modifier = Modifier.fillMaxWidth(),
+                achievement = achievement
             )
         }
     }
 }
 
 @Composable
-fun SettingsSection(onLogout: () -> Unit) {
+fun AchievementItem(modifier: Modifier, achievement: Achievement) {
+    Surface(
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (achievement.isUnlocked) Color(0xFFFFD700).copy(alpha = 0.2f)
+                        else Color.Gray.copy(alpha = 0.2f)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.Star,
+                    contentDescription = null,
+                    tint = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(16.dp))
+            
+            Column {
+                Text(
+                    text = achievement.title,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = achievement.description,
+                    color = Color.Gray,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingsSection(
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit,
+    onLogout: () -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Surface(
-            color = Color(0xFF1E1E1E),
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -283,7 +259,7 @@ fun SettingsSection(onLogout: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF00BFFF))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = "Język", color = Color.White)
+                    Text(text = "Język", color = MaterialTheme.colorScheme.onSurface)
                 }
                 Surface(color = Color.Black.copy(alpha = 0.3f), shape = RoundedCornerShape(8.dp)) {
                     Row(modifier = Modifier.padding(4.dp)) {
@@ -295,7 +271,7 @@ fun SettingsSection(onLogout: () -> Unit) {
         }
 
         Surface(
-            color = Color(0xFF1E1E1E),
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -307,12 +283,15 @@ fun SettingsSection(onLogout: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFFA020F0))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = "Dark Mode", color = Color.White)
+                    Text(text = "Dark Mode", color = MaterialTheme.colorScheme.onSurface)
                 }
                 Switch(
-                    checked = true,
-                    onCheckedChange = { },
-                    colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = Color(0xFFFF2D55))
+                    checked = isDarkMode,
+                    onCheckedChange = onDarkModeChange,
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Color(0xFFFF2D55)
+                    )
                 )
             }
         }

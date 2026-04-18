@@ -78,7 +78,7 @@ fun AdminAddMovieScreen(
                 onBackClick = onBackClick
             )
         },
-        containerColor = Color.Black
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             Column(
@@ -129,7 +129,7 @@ fun AdminTopBar(isEditMode: Boolean, onBackClick: () -> Unit) {
             Column {
                 Text(
                     text = if (isEditMode) "Edytuj Film" else "Dodaj Film",
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -138,10 +138,10 @@ fun AdminTopBar(isEditMode: Boolean, onBackClick: () -> Unit) {
         },
         navigationIcon = {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = Color.White)
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null, tint = MaterialTheme.colorScheme.onSurface)
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black)
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
     )
 }
 
@@ -235,7 +235,7 @@ fun ImagesSection(
                 .fillMaxWidth()
                 .height(100.dp)
                 .clip(RoundedCornerShape(12.dp))
-                .background(if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Color(0xFF1B5E20) else Color(0xFF1E1E1E))
+                .background(if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Color(0xFF2E7D32) else MaterialTheme.colorScheme.surface)
                 .clickable { onVideoClick() },
             contentAlignment = Alignment.Center
         ) {
@@ -278,7 +278,7 @@ fun CastSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
         Button(
             onClick = viewModel::addCastMember,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.1f)),
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), contentColor = MaterialTheme.colorScheme.primary),
             shape = RoundedCornerShape(8.dp)
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
@@ -299,9 +299,9 @@ fun CastMemberItem(member: CastMember, onRemove: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("${member.name} jako ${member.character}", color = Color.White, fontSize = 14.sp)
+        Text("${member.name} jako ${member.character}", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
         IconButton(onClick = onRemove) {
-            Icon(Icons.Default.Delete, contentDescription = null, tint = Color.Red, modifier = Modifier.size(20.dp))
+            Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         }
     }
 }
@@ -358,15 +358,15 @@ fun SaveButton(
 @Composable
 fun AdminSection(title: String, icon: ImageVector, content: @Composable ColumnScope.() -> Unit) {
     Surface(
-        color = Color(0xFF121212),
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(icon, contentDescription = null, tint = Color(0xFF00BFFF), modifier = Modifier.size(20.dp))
+                Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = title, color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text(text = title, color = MaterialTheme.colorScheme.onSurface, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             }
             content()
         }
@@ -387,16 +387,16 @@ fun AdminTextField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = { Text(placeholder, color = Color.DarkGray) },
+            placeholder = { Text(placeholder, color = Color.Gray) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedBorderColor = Color(0xFFFF2D55),
-                unfocusedBorderColor = Color(0xFF333333),
-                focusedContainerColor = Color(0xFF1E1E1E),
-                unfocusedContainerColor = Color(0xFF1E1E1E)
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background
             ),
             minLines = minLines,
             singleLine = minLines == 1
@@ -418,7 +418,7 @@ fun ImagePickerBox(
             .fillMaxWidth()
             .height(height)
             .clip(RoundedCornerShape(12.dp))
-            .background(Color(0xFF1E1E1E))
+            .background(MaterialTheme.colorScheme.surface)
             .clickable { onClick() },
         contentAlignment = Alignment.Center
     ) {

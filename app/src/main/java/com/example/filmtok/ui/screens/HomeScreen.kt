@@ -35,7 +35,7 @@ fun HomeScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = Color.Black
+        color = MaterialTheme.colorScheme.background
     ) {
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -51,7 +51,7 @@ fun HomeScreen(
                     Text(
                         text = "Film Dnia",
                         style = MaterialTheme.typography.headlineMedium,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(16.dp),
                         fontWeight = FontWeight.Bold
                     )
@@ -70,7 +70,7 @@ fun HomeScreen(
                     Text(
                         text = "Ostatnio oglądane",
                         style = MaterialTheme.typography.titleLarge,
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(16.dp),
                         fontWeight = FontWeight.Bold
                     )
@@ -188,7 +188,7 @@ fun MovieCard(movie: Movie, onMovieClick: () -> Unit) {
         Text(
             text = movie.title,
             style = MaterialTheme.typography.bodyLarge,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             maxLines = 1,
             fontWeight = FontWeight.SemiBold
         )

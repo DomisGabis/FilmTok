@@ -43,14 +43,14 @@ fun AdminDashboardScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("FilmTok Admin", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text("FilmTok Admin", color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Surface(
-                            color = Color(0xFFFF2D55).copy(alpha = 0.2f),
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
                                 "TRYB ADMINISTRATORA",
-                                color = Color(0xFFFF2D55),
+                                color = MaterialTheme.colorScheme.primary,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -58,7 +58,7 @@ fun AdminDashboardScreen(
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Black),
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
                 actions = {
                     IconButton(onClick = onLogout) {
                         Icon(Icons.Default.ExitToApp, contentDescription = "Wyloguj", tint = Color.Gray)
@@ -75,7 +75,7 @@ fun AdminDashboardScreen(
                 Icon(Icons.Default.Add, contentDescription = "Dodaj film")
             }
         },
-        containerColor = Color.Black
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
@@ -128,7 +128,7 @@ fun MovieAdminItem(
     onDelete: () -> Unit
 ) {
     Surface(
-        color = Color(0xFF1E1E1E),
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(12.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -151,17 +151,17 @@ fun MovieAdminItem(
             Spacer(modifier = Modifier.width(12.dp))
             
             Column(modifier = Modifier.weight(1f)) {
-                Text(movie.title, color = Color.White, fontWeight = FontWeight.Bold, maxLines = 1)
+                Text(movie.title, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.Bold, maxLines = 1)
                 Text(movie.director, color = Color.Gray, fontSize = 12.sp)
                 Text("${movie.year} | ${movie.rating}⭐", color = Color.Gray, fontSize = 12.sp)
             }
             
             Row {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edytuj", tint = Color.White)
+                    Icon(Icons.Default.Edit, contentDescription = "Edytuj", tint = MaterialTheme.colorScheme.onSurface)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Usuń", tint = Color(0xFFFF2D55))
+                    Icon(Icons.Default.Delete, contentDescription = "Usuń", tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }

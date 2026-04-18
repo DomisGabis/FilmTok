@@ -37,7 +37,7 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
         // Pasek wyszukiwania
@@ -59,10 +59,10 @@ fun SearchScreen(
             singleLine = true,
             shape = RoundedCornerShape(28.dp),
             colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.White,
-                unfocusedTextColor = Color.White,
-                focusedContainerColor = Color(0xFF1E1E1E),
-                unfocusedContainerColor = Color(0xFF1E1E1E),
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedBorderColor = Color.Transparent,
                 unfocusedBorderColor = Color.Transparent
             )
@@ -81,9 +81,9 @@ fun SearchScreen(
                     onClick = { viewModel.onGenreSelect(genre) },
                     label = { Text(genre) },
                     colors = FilterChipDefaults.filterChipColors(
-                        containerColor = Color(0xFF1E1E1E),
+                        containerColor = MaterialTheme.colorScheme.surface,
                         labelColor = Color.Gray,
-                        selectedContainerColor = Color(0xFFFF2D55),
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
                         selectedLabelColor = Color.White
                     ),
                     border = null,
@@ -142,7 +142,7 @@ fun SearchMovieItem(movie: Movie, onClick: () -> Unit) {
         Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center) {
             Text(
                 text = movie.title,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 maxLines = 2
