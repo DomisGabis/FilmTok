@@ -3,14 +3,17 @@ package com.example.filmtok.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filmtok.data.MovieRepository
+import com.example.filmtok.data.StorageRepository
 import com.example.filmtok.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
-    private val repository = MovieRepository()
+class HomeViewModel(
+    private val repository: MovieRepository = MovieRepository(),
+    private val storageRepository: StorageRepository = StorageRepository()
+) : ViewModel() {
 
     private val _heroMovie = MutableStateFlow<Movie?>(null)
     val heroMovie: StateFlow<Movie?> = _heroMovie.asStateFlow()
@@ -29,10 +32,13 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _heroMovie.value = repository.getHeroMovie()
-                _recentlyWatched.value = repository.getRecentlyWatched()
+                val hero = repository.getHeroMovie()
+                val recently = repository.getRecentlyWatched()
+                
+                _heroMovie.value = hero?.let { storageRepository.resolveMovieUrls(it) }
+                _recentlyWatched.value = recently.map { storageRepository.resolveMovieUrls(it) }
             } catch (e: Exception) {
-                // Obsługa błędów w realnej aplikacji
+                // Obsługa błędów
             } finally {
                 _isLoading.value = false
             }
