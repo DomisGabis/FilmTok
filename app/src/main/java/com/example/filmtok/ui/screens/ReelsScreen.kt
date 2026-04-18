@@ -18,14 +18,13 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.model.Movie
-import com.example.filmtok.ui.viewmodel.ReelsViewModel
+import com.example.filmtok.viewmodel.ReelsViewModel
 
 @Composable
 fun ReelsScreen(

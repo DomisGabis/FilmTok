@@ -1,6 +1,5 @@
 package com.example.filmtok.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.model.Movie
-import com.example.filmtok.ui.viewmodel.AdminViewModel
+import com.example.filmtok.viewmodel.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

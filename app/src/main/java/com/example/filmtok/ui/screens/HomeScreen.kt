@@ -17,13 +17,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.filmtok.model.Movie
-import com.example.filmtok.ui.viewmodel.HomeViewModel
+import com.example.filmtok.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(

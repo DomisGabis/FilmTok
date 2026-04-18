@@ -13,7 +13,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.filmtok.ui.viewmodel.AuthViewModel
+import com.example.filmtok.viewmodel.AuthViewModel
 
 @Composable
 fun RegisterScreen(

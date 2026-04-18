@@ -30,8 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.filmtok.model.CastMember
-import com.example.filmtok.ui.viewmodel.AdminMovieFormState
-import com.example.filmtok.ui.viewmodel.AdminViewModel
+import com.example.filmtok.viewmodel.AdminMovieFormState
+import com.example.filmtok.viewmodel.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,14 +42,18 @@ fun AdminAddMovieScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val uploadProgress by viewModel.uploadProgress.collectAsStateWithLifecycle()
     val saveSuccess by viewModel.saveSuccess.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
-    val posterLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val posterLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         viewModel.onPosterUriChange(uri)
     }
-    val backdropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val backdropLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         viewModel.onBackdropUriChange(uri)
+    }
+    val videoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        viewModel.onVideoUriChange(uri)
     }
 
     LaunchedEffect(movieId) {
@@ -97,8 +101,9 @@ fun AdminAddMovieScreen(
 
                 ImagesSection(
                     uiState = uiState,
-                    onPosterClick = { posterLauncher.launch("image/*") },
-                    onBackdropClick = { backdropLauncher.launch("image/*") }
+                    onPosterClick = { posterLauncher.launch(arrayOf("image/*")) },
+                    onBackdropClick = { backdropLauncher.launch(arrayOf("image/*")) },
+                    onVideoClick = { videoLauncher.launch(arrayOf("video/*")) }
                 )
 
                 CastSection(uiState = uiState, viewModel = viewModel)
@@ -108,6 +113,7 @@ fun AdminAddMovieScreen(
 
             SaveButton(
                 isLoading = isLoading,
+                uploadProgress = uploadProgress,
                 onClick = { viewModel.saveMovie(movieId) },
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
@@ -198,9 +204,10 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
 fun ImagesSection(
     uiState: AdminMovieFormState,
     onPosterClick: () -> Unit,
-    onBackdropClick: () -> Unit
+    onBackdropClick: () -> Unit,
+    onVideoClick: () -> Unit
 ) {
-    AdminSection(title = "Plakaty i zdjęcia", icon = Icons.Default.ThumbUp) {
+    AdminSection(title = "Plakaty, zdjęcia i wideo", icon = Icons.Default.ThumbUp) {
         Text("Plakat główny", color = Color.Gray, fontSize = 14.sp)
         ImagePickerBox(
             uri = uiState.posterUri, 
@@ -219,6 +226,33 @@ fun ImagesSection(
             label = "Kliknij aby dodać tło", 
             height = 150.dp
         )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text("Wideo (reels)", color = Color.Gray, fontSize = 14.sp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(100.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Color(0xFF1B5E20) else Color(0xFF1E1E1E))
+                .clickable { onVideoClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Icons.Default.CheckCircle else Icons.Default.PlayArrow,
+                    contentDescription = null,
+                    tint = if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Color.White else Color.Gray
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) "Wideo wybrane" else "Kliknij aby dodać wideo",
+                    color = if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Color.White else Color.Gray,
+                    fontSize = 12.sp
+                )
+            }
+        }
     }
 }
 
@@ -273,21 +307,50 @@ fun CastMemberItem(member: CastMember, onRemove: () -> Unit) {
 }
 
 @Composable
-fun SaveButton(isLoading: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    Button(
-        onClick = onClick,
+fun SaveButton(
+    isLoading: Boolean, 
+    uploadProgress: Float,
+    onClick: () -> Unit, 
+    modifier: Modifier = Modifier
+) {
+    Column(
         modifier = modifier
             .padding(16.dp)
-            .fillMaxWidth()
-            .height(56.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF2D55)),
-        shape = RoundedCornerShape(28.dp),
-        enabled = !isLoading
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if (isLoading) {
-            CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
-        } else {
-            Text("Zapisz", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        if (isLoading && uploadProgress > 0f) {
+            Text(
+                text = "Wysyłanie plików: ${(uploadProgress * 100).toInt()}%",
+                color = Color.White,
+                fontSize = 12.sp
+            )
+            LinearProgressIndicator(
+                progress = { uploadProgress },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                color = Color(0xFFFF2D55),
+                trackColor = Color.White.copy(alpha = 0.1f),
+            )
+        }
+
+        Button(
+            onClick = onClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF2D55)),
+            shape = RoundedCornerShape(28.dp),
+            enabled = !isLoading
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            } else {
+                Text("Zapisz", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
