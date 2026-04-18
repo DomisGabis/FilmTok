@@ -84,19 +84,25 @@ class AdminViewModel(private val repository: MovieRepository = MovieRepository()
             _errorMessage.value = null
             try {
                 val movie = repository.getMovieDetails(movieId)
-                _uiState.update {
-                    it.copy(
-                        title = movie.title,
-                        director = movie.director,
-                        year = movie.year.toString(),
-                        duration = movie.duration,
-                        rating = movie.rating.toString(),
-                        genre = movie.genres.joinToString(", "),
-                        description = movie.description,
-                        existingPosterUrl = movie.posterUrl,
-                        existingBackdropUrl = movie.backdropUrl,
-                        castMembers = movie.cast
-                    )
+
+                if (movie != null) {
+                    // Teraz Kotlin wie, że movie nie jest nullem
+                    _uiState.update {
+                        it.copy(
+                            title = movie.title,
+                            director = movie.director,
+                            year = movie.year.toString(),
+                            duration = movie.duration,
+                            rating = movie.rating.toString(),
+                            genre = movie.genres.joinToString(", "),
+                            description = movie.description,
+                            existingPosterUrl = movie.posterUrl,
+                            existingBackdropUrl = movie.backdropUrl,
+                            castMembers = movie.cast
+                        )
+                    }
+                } else {
+                    _errorMessage.value = "Nie znaleziono filmu o podanym ID."
                 }
             } catch (e: Exception) {
                 _errorMessage.value = "Błąd ładowania filmu: ${e.message}"

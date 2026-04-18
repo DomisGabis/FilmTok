@@ -1,6 +1,7 @@
 package com.example.filmtok
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,18 +13,22 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import com.example.filmtok.data.MovieRepository
+import com.example.filmtok.model.Movie
 import com.example.filmtok.navigation.Screen
 import com.example.filmtok.ui.screens.*
 import com.example.filmtok.ui.theme.FilmTokTheme
 import com.example.filmtok.viewmodel.AuthViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -210,3 +215,5 @@ fun PlaceholderScreen(name: String) {
         Text(text = "Ekran: $name", color = Color.White)
     }
 }
+
+

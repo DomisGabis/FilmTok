@@ -15,7 +15,9 @@ data class Movie(
     val cast: List<CastMember> = emptyList(),
     val gallery: List<String> = emptyList(),
     val likesCount: Int = 0,
-    val commentsCount: Int = 0
+    val commentsCount: Int = 0,
+    val isHero: Boolean = false,
+    val hasVideo: Boolean = false
 )
 
 data class CastMember(
