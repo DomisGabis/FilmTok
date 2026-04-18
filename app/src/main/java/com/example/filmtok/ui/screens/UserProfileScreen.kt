@@ -28,7 +28,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.model.Achievement
 import com.example.filmtok.model.User
-import com.example.filmtok.ui.viewmodel.ProfileViewModel
+import com.example.filmtok.viewmodel.ProfileViewModel
 
 @Composable
 fun UserProfileScreen(

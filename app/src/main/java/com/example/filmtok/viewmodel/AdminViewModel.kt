@@ -1,9 +1,9 @@
-package com.example.filmtok.ui.viewmodel
+package com.example.filmtok.viewmodel
 
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.filmtok.data.repository.MovieRepository
+import com.example.filmtok.data.MovieRepository
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
 import kotlinx.coroutines.flow.MutableStateFlow

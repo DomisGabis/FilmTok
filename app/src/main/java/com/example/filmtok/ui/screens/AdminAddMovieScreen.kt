@@ -30,8 +30,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.filmtok.model.CastMember
-import com.example.filmtok.ui.viewmodel.AdminMovieFormState
-import com.example.filmtok.ui.viewmodel.AdminViewModel
+import com.example.filmtok.viewmodel.AdminMovieFormState
+import com.example.filmtok.viewmodel.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

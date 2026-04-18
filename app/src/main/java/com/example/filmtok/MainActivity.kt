@@ -21,7 +21,7 @@ import androidx.navigation.navArgument
 import com.example.filmtok.navigation.Screen
 import com.example.filmtok.ui.screens.*
 import com.example.filmtok.ui.theme.FilmTokTheme
-import com.example.filmtok.ui.viewmodel.AuthViewModel
+import com.example.filmtok.viewmodel.AuthViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 

@@ -1,4 +1,4 @@
-package com.example.filmtok.data.repository
+package com.example.filmtok.data
 
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
@@ -124,9 +124,24 @@ class MovieRepository {
         director = "Denis Villeneuve",
         description = "Paul Atreides unites with Chani and the Fremen while on a warpath of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the known universe, he endeavors to prevent a terrible future only he can foresee.",
         cast = listOf(
-            CastMember("1", "Timothée Chalamet", "Paul Atreides", "https://image.tmdb.org/t/p/w200/BE79796YInS92v9pG0EIpC9900.jpg"),
-            CastMember("2", "Zendaya", "Chani", "https://image.tmdb.org/t/p/w200/j9S90P8v696894080175.jpg"),
-            CastMember("3", "Rebecca Ferguson", "Lady Jessica", "https://image.tmdb.org/t/p/w200/lJ6LCOcl097893116345.jpg")
+            CastMember(
+                "1",
+                "Timothée Chalamet",
+                "Paul Atreides",
+                "https://image.tmdb.org/t/p/w200/BE79796YInS92v9pG0EIpC9900.jpg"
+            ),
+            CastMember(
+                "2",
+                "Zendaya",
+                "Chani",
+                "https://image.tmdb.org/t/p/w200/j9S90P8v696894080175.jpg"
+            ),
+            CastMember(
+                "3",
+                "Rebecca Ferguson",
+                "Lady Jessica",
+                "https://image.tmdb.org/t/p/w200/lJ6LCOcl097893116345.jpg"
+            )
         ),
         gallery = listOf(
             "https://image.tmdb.org/t/p/w1280/xOMo8NETsO2HnaUfs0vqdI2ofD7.jpg",
@@ -136,8 +151,23 @@ class MovieRepository {
     )
 
     private fun getMockRecentlyWatched() = listOf(
-        Movie("1", "Dune: Part Two", "https://image.tmdb.org/t/p/w500/8uVKfR6VoBovuSpecial.jpg", year = 2024),
-        Movie("2", "Blade Runner 2049", "https://image.tmdb.org/t/p/w500/gajva2L0rQ6vO9YvS9mS6SAt5Z8.jpg", year = 2017),
-        Movie("3", "Interstellar", "https://image.tmdb.org/t/p/w500/gEU2QniE6EwfVnzCuf24hxIn2nn.jpg", year = 2014)
+        Movie(
+            "1",
+            "Dune: Part Two",
+            "https://image.tmdb.org/t/p/w500/8uVKfR6VoBovuSpecial.jpg",
+            year = 2024
+        ),
+        Movie(
+            "2",
+            "Blade Runner 2049",
+            "https://image.tmdb.org/t/p/w500/gajva2L0rQ6vO9YvS9mS6SAt5Z8.jpg",
+            year = 2017
+        ),
+        Movie(
+            "3",
+            "Interstellar",
+            "https://image.tmdb.org/t/p/w500/gEU2QniE6EwfVnzCuf24hxIn2nn.jpg",
+            year = 2014
+        )
     )
 }
