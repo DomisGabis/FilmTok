@@ -1,7 +1,10 @@
 package com.example.filmtok.data
 
 import android.net.Uri
+import com.example.filmtok.model.Movie
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 
 class StorageRepository {
@@ -27,5 +30,28 @@ class StorageRepository {
         }.await()
         
         return ref.downloadUrl.await().toString()
+    }
+
+    suspend fun getDownloadUrl(pathOrUrl: String): String {
+        if (pathOrUrl.isBlank() || pathOrUrl.startsWith("http") || pathOrUrl.startsWith("content://")) {
+            return pathOrUrl
+        }
+        return try {
+            storage.reference.child(pathOrUrl).downloadUrl.await().toString()
+        } catch (e: Exception) {
+            pathOrUrl
+        }
+    }
+
+    suspend fun resolveMovieUrls(movie: Movie): Movie = coroutineScope {
+        val poster = async { getDownloadUrl(movie.posterUrl) }
+        val backdrop = async { getDownloadUrl(movie.backdropUrl) }
+        val video = async { getDownloadUrl(movie.videoUrl) }
+        
+        movie.copy(
+            posterUrl = poster.await(),
+            backdropUrl = backdrop.await(),
+            videoUrl = video.await()
+        )
     }
 }

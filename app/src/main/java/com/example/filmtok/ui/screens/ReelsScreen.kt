@@ -1,5 +1,6 @@
 package com.example.filmtok.ui.screens
 
+import androidx.annotation.OptIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
@@ -17,12 +18,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil.compose.AsyncImage
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import com.example.filmtok.model.Movie
 import com.example.filmtok.viewmodel.ReelsViewModel
 
@@ -56,15 +62,51 @@ fun ReelsScreen(
 
 @Composable
 fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            val mediaItem = MediaItem.fromUri(movie.videoUrl)
+            setMediaItem(mediaItem)
+            prepare()
+            repeatMode = Player.REPEAT_MODE_ALL
+            playWhenReady = true
+        }
+    }
+
+    var isPlayerReady by remember { mutableStateOf(false) }
+
+    DisposableEffect(Unit) {
+        val listener = object : Player.Listener {
+            override fun onPlaybackStateChanged(playbackState: Int) {
+                if (playbackState == Player.STATE_READY) {
+                    isPlayerReady = true
+                }
+            }
+        }
+        exoPlayer.addListener(listener)
+        onDispose {
+            exoPlayer.removeListener(listener)
+            exoPlayer.release()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        // Placeholder dla Video Player (ExoPlayer)
-        // Używamy AsyncImage jako podglądu (thumbnail)
-        AsyncImage(
-            model = movie.posterUrl,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+        AndroidView(
+            factory = {
+                PlayerView(it).apply {
+                    player = exoPlayer
+                    useController = false
+                    resizeMode = androidx.media3.ui.AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                }
+            },
+            modifier = Modifier.fillMaxSize()
         )
+
+        if (!isPlayerReady) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = Color(0xFFFF2D55))
+            }
+        }
 
         // Overlay do przyciemnienia tła pod napisy
         Box(

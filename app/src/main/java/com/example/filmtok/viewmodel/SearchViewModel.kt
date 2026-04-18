@@ -3,11 +3,15 @@ package com.example.filmtok.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filmtok.data.MovieRepository
+import com.example.filmtok.data.StorageRepository
 import com.example.filmtok.model.Movie
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class SearchViewModel(private val repository: MovieRepository = MovieRepository()) : ViewModel() {
+class SearchViewModel(
+    private val repository: MovieRepository = MovieRepository(),
+    private val storageRepository: StorageRepository = StorageRepository()
+) : ViewModel() {
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
 
@@ -33,7 +37,12 @@ class SearchViewModel(private val repository: MovieRepository = MovieRepository(
 
     private fun loadMovies() {
         viewModelScope.launch {
-            _allMovies.value = repository.getAllMovies()
+            try {
+                val movies = repository.getAllMovies()
+                _allMovies.value = movies.map { storageRepository.resolveMovieUrls(it) }
+            } catch (e: Exception) {
+                // Handle error
+            }
         }
     }
 
