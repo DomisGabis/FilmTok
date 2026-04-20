@@ -26,7 +26,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.model.Achievement
 import com.example.filmtok.model.User
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
+import androidx.compose.ui.platform.LocalContext
 import com.example.filmtok.viewmodel.ProfileViewModel
+import androidx.compose.foundation.clickable
 
 @Composable
 fun UserProfileScreen(
@@ -57,20 +63,20 @@ fun UserProfileScreen(
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                SectionHeader(title = "Ulubione gatunki", icon = Icons.Default.Menu)
+                SectionHeader(title = stringResource(R.string.profile_favorite_genres), icon = Icons.Default.Menu)
                 Spacer(modifier = Modifier.height(12.dp))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    items(currentUser.favoriteGenres) { genre ->
-                        GenreChip(genre)
+                    items(currentUser.favoriteGenres) { genreKey ->
+                        GenreChip(genreKey)
                     }
                 }
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                SectionHeader(title = "Osiągnięcia", icon = Icons.Default.Star)
+                SectionHeader(title = stringResource(R.string.profile_achievements), icon = Icons.Default.Star)
                 Spacer(modifier = Modifier.height(12.dp))
                 AchievementsList(currentUser.achievements)
                 
@@ -137,9 +143,9 @@ fun StatsGrid(user: User) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        StatCard(Modifier.weight(1f), Icons.Default.Favorite, user.stats.moviesInBase.toString(), "Filmy")
-        StatCard(Modifier.weight(1f), Icons.Default.PlayArrow, user.stats.moviesWatched.toString(), "Obejrzane")
-        StatCard(Modifier.weight(1f), Icons.Default.Star, user.stats.averageRating.toString(), "Ocena")
+        StatCard(Modifier.weight(1f), Icons.Default.Favorite, user.stats.moviesInBase.toString(), stringResource(R.string.profile_stats_movies))
+        StatCard(Modifier.weight(1f), Icons.Default.PlayArrow, user.stats.moviesWatched.toString(), stringResource(R.string.profile_stats_watched))
+        StatCard(Modifier.weight(1f), Icons.Default.Star, user.stats.averageRating.toString(), stringResource(R.string.profile_stats_rating))
     }
 }
 
@@ -165,14 +171,23 @@ fun SectionHeader(title: String, icon: ImageVector) {
 }
 
 @Composable
-fun GenreChip(genre: String) {
+fun GenreChip(genreKey: String) {
+    val genreName = when (genreKey) {
+        "Sci-Fi" -> stringResource(R.string.genre_sci_fi)
+        "Action" -> stringResource(R.string.genre_action)
+        "Drama" -> stringResource(R.string.genre_drama)
+        "Comedy" -> stringResource(R.string.genre_comedy)
+        "Horror" -> stringResource(R.string.genre_horror)
+        "Thriller" -> stringResource(R.string.genre_thriller)
+        else -> genreKey
+    }
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(20.dp),
         border = androidx.compose.foundation.BorderStroke(1.dp, Color.Gray.copy(alpha = 0.3f))
     ) {
         Text(
-            text = genre,
+            text = genreName,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             fontSize = 14.sp
@@ -224,13 +239,13 @@ fun AchievementItem(modifier: Modifier, achievement: Achievement) {
             
             Column {
                 Text(
-                    text = achievement.title,
+                    text = stringResource(achievement.titleRes),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = achievement.description,
+                    text = stringResource(achievement.descriptionRes),
                     color = Color.Gray,
                     fontSize = 12.sp
                 )
@@ -245,6 +260,14 @@ fun SettingsSection(
     onDarkModeChange: (Boolean) -> Unit,
     onLogout: () -> Unit
 ) {
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val currentLocale = configuration.locales[0].language
+    
+    // Debug log to see the current locale
+    LaunchedEffect(currentLocale) {
+        android.util.Log.d("UserProfileScreen", "Current configuration locale: $currentLocale")
+    }
+
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Surface(
             color = MaterialTheme.colorScheme.surface,
@@ -257,14 +280,53 @@ fun SettingsSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF00BFFF))
+                    Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFF00BFFF))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = "Język", color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = stringResource(R.string.profile_settings_language), color = MaterialTheme.colorScheme.onSurface)
                 }
-                Surface(color = Color.Black.copy(alpha = 0.3f), shape = RoundedCornerShape(8.dp)) {
+                Surface(
+                    color = Color.Black.copy(alpha = 0.3f), 
+                    shape = RoundedCornerShape(8.dp)
+                ) {
                     Row(modifier = Modifier.padding(4.dp)) {
-                        Text("PL", color = Color.White, modifier = Modifier.padding(horizontal = 8.dp))
-                        Text("EN", color = Color.Gray, modifier = Modifier.padding(horizontal = 8.dp))
+                        val isPl = currentLocale.startsWith("pl")
+                        val isEn = currentLocale.startsWith("en")
+
+                        Surface(
+                            color = if (isPl) Color.White.copy(alpha = 0.2f) else Color.Transparent,
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier
+                                .clickable { 
+                                    android.util.Log.d("UserProfileScreen", "Setting locale to PL")
+                                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("pl")
+                                    AppCompatDelegate.setApplicationLocales(appLocale)
+                                }
+                        ) {
+                            Text(
+                                text = "PL", 
+                                color = if (isPl) Color.White else Color.Gray,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                fontWeight = if (isPl) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
+
+                        Surface(
+                            color = if (isEn) Color.White.copy(alpha = 0.2f) else Color.Transparent,
+                            shape = RoundedCornerShape(4.dp),
+                            modifier = Modifier
+                                .clickable { 
+                                    android.util.Log.d("UserProfileScreen", "Setting locale to EN")
+                                    val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags("en")
+                                    AppCompatDelegate.setApplicationLocales(appLocale)
+                                }
+                        ) {
+                            Text(
+                                text = "EN", 
+                                color = if (isEn) Color.White else Color.Gray,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                                fontWeight = if (isEn) FontWeight.Bold else FontWeight.Normal
+                            )
+                        }
                     }
                 }
             }
@@ -283,7 +345,7 @@ fun SettingsSection(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = Color(0xFFA020F0))
                     Spacer(modifier = Modifier.width(12.dp))
-                    Text(text = "Dark Mode", color = MaterialTheme.colorScheme.onSurface)
+                    Text(text = stringResource(R.string.profile_settings_dark_mode), color = MaterialTheme.colorScheme.onSurface)
                 }
                 Switch(
                     checked = isDarkMode,
@@ -303,7 +365,7 @@ fun SettingsSection(
         ) {
             Icon(Icons.Default.ExitToApp, contentDescription = null, tint = Color(0xFFFF2D55))
             Spacer(modifier = Modifier.width(12.dp))
-            Text(text = "Wyloguj się", color = Color(0xFFFF2D55), fontWeight = FontWeight.Bold)
+            Text(text = stringResource(R.string.profile_logout), color = Color(0xFFFF2D55), fontWeight = FontWeight.Bold)
         }
     }
 }

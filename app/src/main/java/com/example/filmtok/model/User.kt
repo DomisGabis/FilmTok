@@ -1,5 +1,7 @@
 package com.example.filmtok.model
 
+import androidx.annotation.StringRes
+
 data class User(
     val id: String = "",
     val name: String = "",
@@ -20,9 +22,9 @@ data class UserStats(
 
 data class Achievement(
     val id: String = "",
-    val title: String = "",
+    @StringRes val titleRes: Int = 0,
     val iconName: String = "",
-    val description: String = "",
+    @StringRes val descriptionRes: Int = 0,
     val color: Long = 0xFFFF2D55,
     val isUnlocked: Boolean = false
 )

@@ -1,8 +1,8 @@
 package com.example.filmtok
 
+import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Box
@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,7 +31,7 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         FirebaseApp.initializeApp(this)
@@ -75,9 +76,10 @@ class MainActivity : ComponentActivity() {
                             ) {
                                 bottomBarItems.forEach { screen ->
                                     val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                                    val label = screen.titleRes?.let { stringResource(it) } ?: ""
                                     NavigationBarItem(
-                                        icon = { screen.icon?.let { Icon(it, contentDescription = screen.title) } },
-                                        label = { Text(screen.title) },
+                                        icon = { screen.icon?.let { Icon(it, contentDescription = label) } },
+                                        label = { Text(label) },
                                         selected = selected,
                                         onClick = {
                                             navController.navigate(screen.route) {

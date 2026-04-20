@@ -27,6 +27,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import com.example.filmtok.viewmodel.MovieDetailsViewModel
 
 @Composable
@@ -116,7 +118,7 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit) {
         ) {
             Icon(Icons.Default.PlayArrow, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Zwiastun", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.movie_trailer), fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -182,7 +184,7 @@ fun GallerySection(images: List<String>) {
     if (images.isNotEmpty()) {
         Column {
             Text(
-                text = "Galeria Ultra-HD",
+                text = stringResource(R.string.movie_gallery),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(16.dp)
@@ -211,7 +213,7 @@ fun GallerySection(images: List<String>) {
 fun CastSection(cast: List<CastMember>) {
     Column {
         Text(
-            text = "Obsada",
+            text = stringResource(R.string.movie_cast),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(16.dp)

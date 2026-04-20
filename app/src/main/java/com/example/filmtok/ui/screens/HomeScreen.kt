@@ -18,6 +18,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,7 +51,7 @@ fun HomeScreen(
             ) {
                 item {
                     Text(
-                        text = "Film Dnia",
+                        text = stringResource(R.string.home_movie_of_the_day),
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(16.dp),
@@ -68,7 +70,7 @@ fun HomeScreen(
 
                 item {
                     Text(
-                        text = "Ostatnio oglądane",
+                        text = stringResource(R.string.home_recently_watched),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(16.dp),

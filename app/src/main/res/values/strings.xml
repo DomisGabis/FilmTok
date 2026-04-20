@@ -1,3 +1,84 @@
 <resources>
     <string name="app_name">FilmTok</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Główna</string>
+    <string name="nav_reels">Rolki</string>
+    <string name="nav_search">Szukaj</string>
+    <string name="nav_profile">Profil</string>
+    <string name="nav_admin">Zarządzaj</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_favorite_genres">Ulubione gatunki</string>
+    <string name="profile_achievements">Osiągnięcia</string>
+    <string name="profile_settings_language">Język</string>
+    <string name="profile_settings_dark_mode">Tryb ciemny</string>
+    <string name="profile_logout">Wyloguj się</string>
+    <string name="profile_stats_movies">Filmy</string>
+    <string name="profile_stats_watched">Obejrzane</string>
+    <string name="profile_stats_rating">Ocena</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Szukaj po tytule, reżyserze...</string>
+    <string name="search_empty_hint">Zacznij wpisywać, aby odkryć filmy</string>
+    <string name="search_popular_hint">Popularne: Dune, Batman, Sci-Fi</string>
+    <string name="search_no_results">Nie znaleziono filmów spełniających kryteria</string>
+
+    <!-- Home Screen -->
+    <string name="home_movie_of_the_day">Film Dnia</string>
+    <string name="home_recently_watched">Ostatnio oglądane</string>
+
+    <!-- Admin Dashboard -->
+    <string name="admin_title">FilmTok Admin</string>
+    <string name="admin_mode_badge">TRYB ADMINISTRATORA</string>
+    <string name="admin_no_movies">Brak filmów w bazie</string>
+
+    <!-- Admin Add/Edit Movie -->
+    <string name="admin_add_movie_title">Dodaj Film</string>
+    <string name="admin_edit_movie_title">Edytuj Film</string>
+    <string name="admin_form_subtitle">Wypełnij wszystkie pola</string>
+    <string name="admin_section_basic">Podstawowe informacje</string>
+    <string name="admin_section_media">Plakaty, zdjęcia i wideo</string>
+    <string name="admin_section_cast">Obsada</string>
+    <string name="admin_save">Zapisz</string>
+
+    <!-- Movie Details -->
+    <string name="movie_trailer">Zwiastun</string>
+    <string name="movie_gallery">Galeria Ultra-HD</string>
+    <string name="movie_cast">Obsada</string>
+    <!-- Search Genres -->
+    <string name="genre_all">Wszystkie</string>
+    <string name="genre_sci_fi">Sci-Fi</string>
+    <string name="genre_action">Akcja</string>
+    <string name="genre_drama">Dramat</string>
+    <string name="genre_comedy">Komedia</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_thriller">Thriller</string>
+    <!-- Auth Screens -->
+    <string name="login_title">Zaloguj się, aby zarządzać profilem</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_password_label">Hasło</string>
+    <string name="login_button">Zaloguj się</string>
+    <string name="login_no_account">Nie masz konta? Zarejestruj się</string>
+    <string name="login_empty_fields">Uzupełnij wszystkie pola</string>
+    <string name="login_error_prefix">Błąd logowania: </string>
+
+    <!-- Achievements -->
+    <string name="achievement_collector_title">Kolekcjoner</string>
+    <string name="achievement_collector_desc">Dodaj 50 filmów do biblioteki</string>
+    <string name="achievement_critic_title">Krytyk</string>
+    <string name="achievement_critic_desc">Wystaw 100 ocen</string>
+    <string name="achievement_marathoner_title">Maratończyk</string>
+    <string name="achievement_marathoner_desc">Oglądaj przez 10h bez przerwy</string>
+
+    <string name="register_title">Dołącz do FilmTok</string>
+    <string name="register_subtitle">Stwórz konto, aby odkrywać filmy</string>
+    <string name="register_confirm_password_label">Powtórz hasło</string>
+    <string name="register_button">Zarejestruj się</string>
+    <string name="register_has_account">Masz już konto? Zaloguj się</string>
+    <string name="register_error_empty_email">Email nie może być pusty</string>
+    <string name="register_error_empty_password">Hasło nie może być puste</string>
+    <string name="register_error_mismatch">Hasła nie są identyczne</string>
+    <string name="register_error_too_short">Hasło musi mieć min. 6 znaków</string>
+    <string name="register_error_prefix">Błąd rejestracji: </string>
 </resources>

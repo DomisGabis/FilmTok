@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.model.Movie
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import com.example.filmtok.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +49,7 @@ fun SearchScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            placeholder = { Text("Szukaj po tytule, reżyserze...", color = Color.Gray) },
+            placeholder = { Text(stringResource(R.string.search_placeholder), color = Color.Gray) },
             leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
             trailingIcon = {
                 Icon(
@@ -79,7 +81,7 @@ fun SearchScreen(
                 FilterChip(
                     selected = isSelected,
                     onClick = { viewModel.onGenreSelect(genre) },
-                    label = { Text(genre) },
+                    label = { Text(stringResource(genre)) },
                     colors = FilterChipDefaults.filterChipColors(
                         containerColor = MaterialTheme.colorScheme.surface,
                         labelColor = Color.Gray,
@@ -96,14 +98,14 @@ fun SearchScreen(
         if (searchQuery.isEmpty() && filteredMovies.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Zacznij wpisywać, aby odkryć filmy", color = Color.Gray)
+                    Text(stringResource(R.string.search_empty_hint), color = Color.Gray)
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text("Popularne: Dune, Batman, Sci-Fi", color = Color.DarkGray, fontSize = 12.sp)
+                    Text(stringResource(R.string.search_popular_hint), color = Color.DarkGray, fontSize = 12.sp)
                 }
             }
         } else if (filteredMovies.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Nie znaleziono filmów spełniających kryteria", color = Color.Gray)
+                Text(stringResource(R.string.search_no_results), color = Color.Gray)
             }
         } else {
             LazyColumn(

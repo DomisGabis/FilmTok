@@ -34,7 +34,7 @@ class AuthViewModel(
             try {
                 _userRole.value = repository.fetchOrCreateUserRole(uid)
             } catch (e: Exception) {
-                _errorMessage.value = "Błąd pobierania roli: ${e.message}"
+                _errorMessage.value = e.message
                 _userRole.value = "user"
             } finally {
                 _isLoading.value = false
@@ -50,7 +50,7 @@ class AuthViewModel(
                 repository.registerWithEmail(email, pass)
                 _userRole.value = "user"
             } catch (e: Exception) {
-                _errorMessage.value = "Błąd rejestracji: ${e.message}"
+                _errorMessage.value = e.message
             } finally {
                 _isLoading.value = false
             }
@@ -65,7 +65,7 @@ class AuthViewModel(
                 val uid = repository.signInWithEmail(email, pass)
                 checkUserRole(uid)
             } catch (e: Exception) {
-                _errorMessage.value = "Błąd logowania: ${e.message}"
+                _errorMessage.value = e.message
             } finally {
                 _isLoading.value = false
             }

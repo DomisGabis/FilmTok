@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import coil.compose.AsyncImage
 import com.example.filmtok.model.Movie
 import com.example.filmtok.viewmodel.AdminViewModel
@@ -43,13 +45,13 @@ fun AdminDashboardScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("FilmTok Admin", color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text(stringResource(R.string.admin_title), color = MaterialTheme.colorScheme.onSurface, fontSize = 18.sp, fontWeight = FontWeight.Bold)
                         Surface(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                             shape = RoundedCornerShape(4.dp)
                         ) {
                             Text(
-                                "TRYB ADMINISTRATORA",
+                                stringResource(R.string.admin_mode_badge),
                                 color = MaterialTheme.colorScheme.primary,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
@@ -95,7 +97,7 @@ fun AdminDashboardScreen(
                 }
                 movies.isEmpty() -> {
                     Text(
-                        text = "Brak filmów w bazie",
+                        text = stringResource(R.string.admin_no_movies),
                         color = Color.Gray,
                         modifier = Modifier.align(Alignment.Center),
                         fontSize = 14.sp

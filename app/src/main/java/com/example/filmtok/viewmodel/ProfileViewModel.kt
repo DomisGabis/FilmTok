@@ -1,6 +1,7 @@
 package com.example.filmtok.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.example.filmtok.R
 import com.example.filmtok.model.Achievement
 import com.example.filmtok.model.User
 import com.example.filmtok.model.UserStats
@@ -31,9 +32,9 @@ class ProfileViewModel : ViewModel() {
             ),
             favoriteGenres = listOf("Sci-Fi", "Action", "Drama"),
             achievements = listOf(
-                Achievement("1", "Kolekcjoner", "Movie", "Dodaj 50 filmów do biblioteki", 0xFFFF2D55, true),
-                Achievement("2", "Krytyk", "Star", "Wystaw 100 ocen", 0xFF00BFFF, true),
-                Achievement("3", "Maratończyk", "Timer", "Oglądaj przez 10h bez przerwy", 0xFF8A2BE2, false)
+                Achievement("1", R.string.achievement_collector_title, "Movie", R.string.achievement_collector_desc, 0xFFFF2D55, true),
+                Achievement("2", R.string.achievement_critic_title, "Star", R.string.achievement_critic_desc, 0xFF00BFFF, true),
+                Achievement("3", R.string.achievement_marathoner_title, "Timer", R.string.achievement_marathoner_desc, 0xFF8A2BE2, false)
             )
         )
     }

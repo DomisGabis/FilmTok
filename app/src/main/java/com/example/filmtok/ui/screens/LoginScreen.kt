@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
@@ -29,6 +31,7 @@ fun LoginScreen(
     var isLoading by remember { mutableStateOf(false) }
 
     val auth = FirebaseAuth.getInstance()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     Column(
         modifier = Modifier
@@ -48,7 +51,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Zaloguj się, aby zarządzać profilem",
+            text = stringResource(R.string.login_title),
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
@@ -58,7 +61,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.login_email_label)) },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
@@ -75,7 +78,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Hasło") },
+            label = { Text(stringResource(R.string.login_password_label)) },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
@@ -106,11 +109,11 @@ fun LoginScreen(
                                 // tam nastąpi sprawdzenie roli w Firestore
                                 onLoginSuccess(task.result?.user?.uid ?: "")
                             } else {
-                                errorMessage = "Błąd logowania: ${task.exception?.message}"
+                                errorMessage = context.getString(R.string.login_error_prefix) + (task.exception?.message ?: "Unknown")
                             }
                         }
                 } else {
-                    errorMessage = "Uzupełnij wszystkie pola"
+                    errorMessage = context.getString(R.string.login_empty_fields)
                 }
             },
             modifier = Modifier
@@ -126,7 +129,7 @@ fun LoginScreen(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Person, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Zaloguj się", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.login_button), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -134,7 +137,7 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         TextButton(onClick = onNavigateToRegister) {
-            Text(text = "Nie masz konta? Zarejestruj się", color = Color.Gray)
+            Text(text = stringResource(R.string.login_no_account), color = Color.Gray)
         }
     }
 }

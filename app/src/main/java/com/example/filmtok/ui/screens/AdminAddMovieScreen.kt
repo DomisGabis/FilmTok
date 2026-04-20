@@ -31,6 +31,8 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.viewmodel.AdminMovieFormState
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import com.example.filmtok.viewmodel.AdminViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -97,7 +99,7 @@ fun AdminAddMovieScreen(
                     )
                 }
 
-                BasicInfoSection(uiState = uiState, viewModel = viewModel)
+    BasicInfoSection(uiState = uiState, viewModel = viewModel)
 
                 ImagesSection(
                     uiState = uiState,
@@ -128,12 +130,12 @@ fun AdminTopBar(isEditMode: Boolean, onBackClick: () -> Unit) {
         title = {
             Column {
                 Text(
-                    text = if (isEditMode) "Edytuj Film" else "Dodaj Film",
+                    text = if (isEditMode) stringResource(R.string.admin_edit_movie_title) else stringResource(R.string.admin_add_movie_title),
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
-                Text("Wypełnij wszystkie pola", color = Color.Gray, fontSize = 12.sp)
+                Text(stringResource(R.string.admin_form_subtitle), color = Color.Gray, fontSize = 12.sp)
             }
         },
         navigationIcon = {
@@ -147,7 +149,7 @@ fun AdminTopBar(isEditMode: Boolean, onBackClick: () -> Unit) {
 
 @Composable
 fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
-    AdminSection(title = "Podstawowe informacje", icon = Icons.Default.Info) {
+    AdminSection(title = stringResource(R.string.admin_section_basic), icon = Icons.Default.Info) {
         AdminTextField(
             value = uiState.title,
             onValueChange = viewModel::onTitleChange,
@@ -207,7 +209,7 @@ fun ImagesSection(
     onBackdropClick: () -> Unit,
     onVideoClick: () -> Unit
 ) {
-    AdminSection(title = "Plakaty, zdjęcia i wideo", icon = Icons.Default.ThumbUp) {
+    AdminSection(title = stringResource(R.string.admin_section_media), icon = Icons.Default.ThumbUp) {
         Text("Plakat główny", color = Color.Gray, fontSize = 14.sp)
         ImagePickerBox(
             uri = uiState.posterUri, 
@@ -258,7 +260,7 @@ fun ImagesSection(
 
 @Composable
 fun CastSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
-    AdminSection(title = "Obsada", icon = Icons.Default.Person) {
+    AdminSection(title = stringResource(R.string.admin_section_cast), icon = Icons.Default.Person) {
         AdminTextField(
             value = uiState.actorName,
             onValueChange = viewModel::onActorNameChange,
@@ -349,7 +351,7 @@ fun SaveButton(
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Zapisz", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.admin_save), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
     }

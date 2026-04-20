@@ -1,0 +1,84 @@
+<resources>
+    <string name="app_name">FilmTok</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_reels">Reels</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_profile">Profile</string>
+    <string name="nav_admin">Manage</string>
+
+    <!-- Profile Screen -->
+    <string name="profile_favorite_genres">Favorite Genres</string>
+    <string name="profile_achievements">Achievements</string>
+    <string name="profile_settings_language">Language</string>
+    <string name="profile_settings_dark_mode">Dark Mode</string>
+    <string name="profile_logout">Log out</string>
+    <string name="profile_stats_movies">Movies</string>
+    <string name="profile_stats_watched">Watched</string>
+    <string name="profile_stats_rating">Rating</string>
+
+    <!-- Search Screen -->
+    <string name="search_placeholder">Search by title, director…</string>
+    <string name="search_empty_hint">Start typing to discover movies</string>
+    <string name="search_popular_hint">Popular: Dune, Batman, Sci-Fi</string>
+    <string name="search_no_results">No movies found matching criteria</string>
+
+    <!-- Home Screen -->
+    <string name="home_movie_of_the_day">Movie of the Day</string>
+    <string name="home_recently_watched">Recently Watched</string>
+
+    <!-- Admin Dashboard -->
+    <string name="admin_title">FilmTok Admin</string>
+    <string name="admin_mode_badge">ADMIN MODE</string>
+    <string name="admin_no_movies">No movies in database</string>
+
+    <!-- Admin Add/Edit Movie -->
+    <string name="admin_add_movie_title">Add Movie</string>
+    <string name="admin_edit_movie_title">Edit Movie</string>
+    <string name="admin_form_subtitle">Fill all fields</string>
+    <string name="admin_section_basic">Basic information</string>
+    <string name="admin_section_media">Posters, photos and video</string>
+    <string name="admin_section_cast">Cast</string>
+    <string name="admin_save">Save</string>
+
+    <!-- Movie Details -->
+    <string name="movie_trailer">Trailer</string>
+    <string name="movie_gallery">Ultra-HD Gallery</string>
+    <string name="movie_cast">Cast</string>
+    <!-- Search Genres -->
+    <string name="genre_all">All</string>
+    <string name="genre_sci_fi">Sci-Fi</string>
+    <string name="genre_action">Action</string>
+    <string name="genre_drama">Drama</string>
+    <string name="genre_comedy">Comedy</string>
+    <string name="genre_horror">Horror</string>
+    <string name="genre_thriller">Thriller</string>
+    <!-- Auth Screens -->
+    <string name="login_title">Log in to manage your profile</string>
+    <string name="login_email_label">Email</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_button">Log in</string>
+    <string name="login_no_account">Don\'t have an account? Sign up</string>
+    <string name="login_empty_fields">Fill all fields</string>
+    <string name="login_error_prefix">Login error: </string>
+
+    <!-- Achievements -->
+    <string name="achievement_collector_title">Collector</string>
+    <string name="achievement_collector_desc">Add 50 movies to the library</string>
+    <string name="achievement_critic_title">Critic</string>
+    <string name="achievement_critic_desc">Give 100 ratings</string>
+    <string name="achievement_marathoner_title">Marathoner</string>
+    <string name="achievement_marathoner_desc">Watch for 10 hours without a break</string>
+
+    <string name="register_title">Join FilmTok</string>
+    <string name="register_subtitle">Create an account to discover movies</string>
+    <string name="register_confirm_password_label">Confirm password</string>
+    <string name="register_button">Sign up</string>
+    <string name="register_has_account">Already have an account? Log in</string>
+    <string name="register_error_empty_email">Email cannot be empty</string>
+    <string name="register_error_empty_password">Password cannot be empty</string>
+    <string name="register_error_mismatch">Passwords do not match</string>
+    <string name="register_error_too_short">Password must be at least 6 characters</string>
+    <string name="register_error_prefix">Registration error: </string>
+</resources>

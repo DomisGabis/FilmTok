@@ -13,6 +13,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import com.example.filmtok.R
 import com.example.filmtok.viewmodel.AuthViewModel
 
 @Composable
@@ -28,6 +30,7 @@ fun RegisterScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
     val userRole by viewModel.userRole.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     LaunchedEffect(userRole) {
         if (userRole != null) {
@@ -44,14 +47,14 @@ fun RegisterScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Dołącz do FilmTok",
+            text = stringResource(R.string.register_title),
             color = Color.White,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold
         )
         
         Text(
-            text = "Stwórz konto, aby odkrywać filmy",
+            text = stringResource(R.string.register_subtitle),
             color = Color.Gray,
             fontSize = 16.sp,
             modifier = Modifier.padding(top = 8.dp, bottom = 32.dp)
@@ -60,7 +63,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text(stringResource(R.string.login_email_label)) },
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = Color.White,
@@ -76,7 +79,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Hasło") },
+            label = { Text(stringResource(R.string.login_password_label)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
@@ -93,7 +96,7 @@ fun RegisterScreen(
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Powtórz hasło") },
+            label = { Text(stringResource(R.string.register_confirm_password_label)) },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             colors = OutlinedTextFieldDefaults.colors(
@@ -119,10 +122,10 @@ fun RegisterScreen(
         Button(
             onClick = {
                 when {
-                    email.isBlank() -> viewModel.setErrorMessage("Email nie może być pusty")
-                    password.isBlank() -> viewModel.setErrorMessage("Hasło nie może być puste")
-                    password != confirmPassword -> viewModel.setErrorMessage("Hasła nie są identyczne")
-                    password.length < 6 -> viewModel.setErrorMessage("Hasło musi mieć min. 6 znaków")
+                    email.isBlank() -> viewModel.setErrorMessage(context.getString(R.string.register_error_empty_email))
+                    password.isBlank() -> viewModel.setErrorMessage(context.getString(R.string.register_error_empty_password))
+                    password != confirmPassword -> viewModel.setErrorMessage(context.getString(R.string.register_error_mismatch))
+                    password.length < 6 -> viewModel.setErrorMessage(context.getString(R.string.register_error_too_short))
                     else -> viewModel.register(email.trim(), password)
                 }
             },
@@ -136,7 +139,7 @@ fun RegisterScreen(
             if (isLoading) {
                 CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
             } else {
-                Text("Zarejestruj się", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.register_button), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
         }
 
@@ -144,7 +147,7 @@ fun RegisterScreen(
             onClick = onNavigateToLogin,
             modifier = Modifier.padding(top = 16.dp)
         ) {
-            Text("Masz już konto? Zaloguj się", color = Color.Gray)
+            Text(stringResource(R.string.register_has_account), color = Color.Gray)
         }
     }
 }
