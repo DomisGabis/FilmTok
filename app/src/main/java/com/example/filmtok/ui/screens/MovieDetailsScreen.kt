@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -19,11 +20,19 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
@@ -54,17 +63,30 @@ fun MovieDetailsScreen(
             }
         } else {
             movie?.let { movieData ->
+                var showTrailer by remember { mutableStateOf(false) }
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
                 ) {
-                    MovieHeader(movieData, onBackClick)
+                    MovieHeader(
+                        movie = movieData,
+                        onBackClick = onBackClick,
+                        onTrailerClick = { showTrailer = true }
+                    )
                     MovieInfoSection(movieData)
                     DescriptionSection(movieData.description)
                     GallerySection(movieData.gallery)
                     CastSection(movieData.cast)
                     Spacer(modifier = Modifier.height(32.dp))
+                }
+
+                if (showTrailer && movieData.videoUrl.isNotEmpty()) {
+                    TrailerDialog(
+                        videoUrl = movieData.videoUrl,
+                        onDismiss = { showTrailer = false }
+                    )
                 }
             }
         }
@@ -72,7 +94,7 @@ fun MovieDetailsScreen(
 }
 
 @Composable
-fun MovieHeader(movie: Movie, onBackClick: () -> Unit) {
+fun MovieHeader(movie: Movie, onBackClick: () -> Unit, onTrailerClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,7 +129,7 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit) {
 
         // Action Button (Trailer)
         Button(
-            onClick = { /* Play Trailer */ },
+            onClick = onTrailerClick,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 24.dp)
@@ -119,6 +141,65 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit) {
             Icon(Icons.Default.PlayArrow, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
             Text(stringResource(R.string.movie_trailer), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+@Composable
+fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build().apply {
+            val mediaItem = MediaItem.fromUri(videoUrl)
+            setMediaItem(mediaItem)
+            prepare()
+            playWhenReady = true
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Color.Black
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .systemBarsPadding()
+            ) {
+                AndroidView(
+                    factory = {
+                        PlayerView(it).apply {
+                            player = exoPlayer
+                            useController = true
+                            setBackgroundColor(0)
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                IconButton(
+                    onClick = onDismiss,
+                    modifier = Modifier
+                        .padding(top = 16.dp, end = 16.dp)
+                        .align(Alignment.TopEnd)
+                        .background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                }
+            }
         }
     }
 }
