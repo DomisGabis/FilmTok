@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.filmtok.data.MovieRepository
 import com.example.filmtok.data.StorageRepository
 import com.example.filmtok.model.Movie
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,9 +31,12 @@ class ReelsViewModel(
             _isLoading.value = true
             try {
                 val rawReels = repository.getReels()
-                _reels.value = rawReels.map { storageRepository.resolveMovieUrls(it) }
+                val resolvedReels = rawReels.map { movie ->
+                    async { storageRepository.resolveMovieUrls(movie) }
+                }.awaitAll()
+                _reels.value = resolvedReels
             } catch (e: Exception) {
-                // Handle error
+                e.printStackTrace()
             } finally {
                 _isLoading.value = false
             }
