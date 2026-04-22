@@ -2,6 +2,7 @@ package com.example.filmtok.ui.screens
 
 import androidx.annotation.OptIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -74,6 +75,7 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
     }
 
     var isPlayerReady by remember { mutableStateOf(false) }
+    var isPlaying by remember { mutableStateOf(true) }
 
     DisposableEffect(Unit) {
         val listener = object : Player.Listener {
@@ -81,6 +83,10 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
                 if (playbackState == Player.STATE_READY) {
                     isPlayerReady = true
                 }
+            }
+
+            override fun onIsPlayingChanged(playing: Boolean) {
+                isPlaying = playing
             }
         }
         exoPlayer.addListener(listener)
@@ -90,7 +96,18 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable {
+                if (exoPlayer.isPlaying) {
+                    exoPlayer.pause()
+                } else {
+                    exoPlayer.play()
+                }
+            }
+    ) {
         AndroidView(
             factory = {
                 PlayerView(it).apply {
@@ -120,16 +137,18 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
                 )
         )
 
-        // Środkowa ikona Play (statyczna dla placeholdera)
-        Icon(
-            imageVector = Icons.Default.PlayArrow,
-            contentDescription = null,
-            modifier = Modifier
-                .size(80.dp)
-                .align(Alignment.Center)
-                .background(Color.Black.copy(alpha = 0.2f), CircleShape),
-            tint = Color.White.copy(alpha = 0.5f)
-        )
+        // Środkowa ikona Play (pokazuje się tylko gdy film jest zatrzymany)
+        if (!isPlaying) {
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(80.dp)
+                    .align(Alignment.Center)
+                    .background(Color.Black.copy(alpha = 0.2f), CircleShape),
+                tint = Color.White.copy(alpha = 0.5f)
+            )
+        }
 
         // Prawy panel z akcjami
         Column(

@@ -4,6 +4,7 @@ import android.net.Uri
 import com.example.filmtok.model.Movie
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
 
@@ -48,10 +49,22 @@ class StorageRepository {
         val backdrop = async { getDownloadUrl(movie.backdropUrl) }
         val video = async { getDownloadUrl(movie.videoUrl) }
         
+        val resolvedGallery = movie.gallery.map { url ->
+            async { getDownloadUrl(url) }
+        }
+        
+        val resolvedCast = movie.cast.map { member ->
+            async { 
+                member.copy(imageUrl = getDownloadUrl(member.imageUrl))
+            }
+        }
+        
         movie.copy(
             posterUrl = poster.await(),
             backdropUrl = backdrop.await(),
-            videoUrl = video.await()
+            videoUrl = video.await(),
+            gallery = resolvedGallery.awaitAll(),
+            cast = resolvedCast.awaitAll()
         )
     }
 }
