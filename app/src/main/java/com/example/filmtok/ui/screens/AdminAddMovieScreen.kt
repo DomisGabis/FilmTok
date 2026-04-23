@@ -59,9 +59,15 @@ fun AdminAddMovieScreen(
     }
 
     LaunchedEffect(movieId) {
-        if (movieId != null) {
+        if (!movieId.isNullOrBlank() && movieId != "{movieId}") {
             viewModel.loadMovie(movieId)
         } else {
+            viewModel.clearMovieToEdit()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
             viewModel.clearMovieToEdit()
         }
     }

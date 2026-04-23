@@ -1,5 +1,6 @@
 package com.example.filmtok
 
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -37,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         enableEdgeToEdge()
         setContent {
-            var isDarkMode by remember { mutableStateOf(true) }
+            var isDarkMode by rememberSaveable { mutableStateOf(true) }
 
             FilmTokTheme(darkTheme = isDarkMode) {
                 val authViewModel: AuthViewModel = viewModel()
@@ -164,7 +165,7 @@ class MainActivity : AppCompatActivity() {
                                     navController.navigate(Screen.Login.route) { popUpTo(0) }
                                 },
                                 onNavigateToAddMovie = {
-                                    navController.navigate(Screen.AdminAddMovie.route)
+                                    navController.navigate(Screen.AdminAddMovie.createRoute())
                                 },
                                 onNavigateToEditMovie = { movieId ->
                                     navController.navigate(Screen.AdminAddMovie.createRoute(movieId))
@@ -176,6 +177,7 @@ class MainActivity : AppCompatActivity() {
                             route = Screen.AdminAddMovie.route,
                             arguments = listOf(navArgument("movieId") { 
                                 nullable = true
+                                defaultValue = null
                                 type = NavType.StringType 
                             })
                         ) { backStackEntry ->
