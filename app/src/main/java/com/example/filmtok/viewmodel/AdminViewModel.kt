@@ -19,7 +19,7 @@ data class AdminMovieFormState(
     val year: String = "",
     val duration: String = "",
     val rating: String = "",
-    val genre: String = "",
+    val genres: List<String> = emptyList(),
     val description: String = "",
     val posterUri: Uri? = null,
     val backdropUri: Uri? = null,
@@ -30,7 +30,8 @@ data class AdminMovieFormState(
     val castMembers: List<CastMember> = emptyList(),
     val actorName: String = "",
     val actorRole: String = "",
-    val actorImageUrl: String = ""
+    val actorImageUrl: String = "",
+    val actorImageUri: Uri? = null
 )
 
 class AdminViewModel(
@@ -102,7 +103,7 @@ class AdminViewModel(
                             year = movie.year.toString(),
                             duration = movie.duration,
                             rating = movie.rating.toString(),
-                            genre = movie.genres.joinToString(", "),
+                            genres = movie.genres,
                             description = movie.description,
                             existingPosterUrl = movie.posterUrl,
                             existingBackdropUrl = movie.backdropUrl,
@@ -132,7 +133,15 @@ class AdminViewModel(
     fun onYearChange(value: String) = _uiState.update { it.copy(year = value) }
     fun onDurationChange(value: String) = _uiState.update { it.copy(duration = value) }
     fun onRatingChange(value: String) = _uiState.update { it.copy(rating = value) }
-    fun onGenreChange(value: String) = _uiState.update { it.copy(genre = value) }
+    fun onGenreToggle(genre: String) = _uiState.update { state ->
+        val currentGenres = state.genres
+        val newGenres = if (currentGenres.contains(genre)) {
+            currentGenres - genre
+        } else {
+            currentGenres + genre
+        }
+        state.copy(genres = newGenres)
+    }
     fun onDescriptionChange(value: String) = _uiState.update { it.copy(description = value) }
     fun onPosterUriChange(uri: Uri?) = _uiState.update { it.copy(posterUri = uri) }
     fun onBackdropUriChange(uri: Uri?) = _uiState.update { it.copy(backdropUri = uri) }
@@ -140,21 +149,24 @@ class AdminViewModel(
     fun onActorNameChange(value: String) = _uiState.update { it.copy(actorName = value) }
     fun onActorRoleChange(value: String) = _uiState.update { it.copy(actorRole = value) }
     fun onActorImageUrlChange(value: String) = _uiState.update { it.copy(actorImageUrl = value) }
+    fun onActorImageUriChange(uri: Uri?) = _uiState.update { it.copy(actorImageUri = uri) }
 
     fun addCastMember() {
         val state = _uiState.value
         if (state.actorName.isNotBlank() && state.actorRole.isNotBlank()) {
+            val imageUrl = state.actorImageUri?.toString() ?: state.actorImageUrl
             val newMember = CastMember(
                 name = state.actorName,
                 character = state.actorRole,
-                imageUrl = state.actorImageUrl
+                imageUrl = imageUrl
             )
             _uiState.update {
                 it.copy(
                     castMembers = it.castMembers + newMember,
                     actorName = "",
                     actorRole = "",
-                    actorImageUrl = ""
+                    actorImageUrl = "",
+                    actorImageUri = null
                 )
             }
         }
@@ -196,6 +208,18 @@ class AdminViewModel(
                     }
                 }
 
+                val updatedCast = state.castMembers.mapIndexed { index, member ->
+                    if (member.imageUrl.startsWith("content://") || member.imageUrl.startsWith("file://")) {
+                        val uri = Uri.parse(member.imageUrl)
+                        val uploadedUrl = storageRepository.uploadImage(uri, "movies/$id/cast/actor_${index}_${System.currentTimeMillis()}.jpg") {
+                            // opcjonalnie postęp dla obsady
+                        }
+                        member.copy(imageUrl = uploadedUrl)
+                    } else {
+                        member
+                    }
+                }
+
                 val movie = Movie(
                     id = id,
                     title = state.title,
@@ -203,12 +227,12 @@ class AdminViewModel(
                     year = state.year.toIntOrNull() ?: 2024,
                     duration = state.duration,
                     rating = state.rating.toDoubleOrNull() ?: 0.0,
-                    genres = state.genre.split(",").map { it.trim() },
+                    genres = state.genres,
                     description = state.description,
                     posterUrl = posterUrl,
                     backdropUrl = backdropUrl,
                     videoUrl = videoUrl,
-                    cast = state.castMembers,
+                    cast = updatedCast,
                     hasVideo = videoUrl.isNotEmpty()
                 )
                 repository.saveMovie(movie)
