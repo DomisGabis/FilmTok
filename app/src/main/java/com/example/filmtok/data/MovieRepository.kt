@@ -2,6 +2,10 @@ package com.example.filmtok.data
 
 import com.example.filmtok.model.Movie
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class MovieRepository {
@@ -67,6 +71,22 @@ class MovieRepository {
         } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    fun getMoviesFlow(): Flow<List<Movie>> = callbackFlow {
+        val subscription = moviesCollection
+            .orderBy("year", Query.Direction.DESCENDING)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val movies = snapshot.toObjects(Movie::class.java)
+                    trySend(movies)
+                }
+            }
+        awaitClose { subscription.remove() }
     }
 
     fun getNewId(): String = moviesCollection.document().id

@@ -23,12 +23,26 @@ class SearchViewModel(
     
     val genres = listOf(
         R.string.genre_all,
-        R.string.genre_sci_fi,
         R.string.genre_action,
-        R.string.genre_drama,
+        R.string.genre_adventure,
+        R.string.genre_animation,
+        R.string.genre_biopic,
         R.string.genre_comedy,
+        R.string.genre_crime,
+        R.string.genre_disaster,
+        R.string.genre_documentary,
+        R.string.genre_drama,
+        R.string.genre_fantasy,
         R.string.genre_horror,
-        R.string.genre_thriller
+        R.string.genre_musical,
+        R.string.genre_mystery,
+        R.string.genre_romance,
+        R.string.genre_romcom,
+        R.string.genre_sci_fi,
+        R.string.genre_superhero,
+        R.string.genre_thriller,
+        R.string.genre_war,
+        R.string.genre_western
     )
 
     val filteredMovies: StateFlow<List<Movie>> = combine(_searchQuery, _selectedGenre, _allMovies) { query, genreRes, movies ->
@@ -36,9 +50,6 @@ class SearchViewModel(
             val matchesQuery = movie.title.contains(query, ignoreCase = true) || 
                              movie.director.contains(query, ignoreCase = true)
             
-            // Note: This is a bit tricky since movie.genres are strings from DB.
-            // For now, we compare against English strings or a mapping if needed.
-            // Ideally, genres in DB should also be keys or we need a localized mapping.
             val matchesGenre = genreRes == R.string.genre_all || movie.genres.any { it.equals(getGenreName(genreRes), ignoreCase = true) }
             matchesQuery && matchesGenre
         }
@@ -46,12 +57,26 @@ class SearchViewModel(
 
     private fun getGenreName(resId: Int): String {
         return when(resId) {
-            R.string.genre_sci_fi -> "Sci-Fi"
             R.string.genre_action -> "Action"
-            R.string.genre_drama -> "Drama"
+            R.string.genre_adventure -> "Adventure"
+            R.string.genre_animation -> "Animation / Animated film"
+            R.string.genre_biopic -> "Biopic / Biographical film"
             R.string.genre_comedy -> "Comedy"
+            R.string.genre_crime -> "Crime"
+            R.string.genre_disaster -> "Disaster movie"
+            R.string.genre_documentary -> "Documentary"
+            R.string.genre_drama -> "Drama"
+            R.string.genre_fantasy -> "Fantasy"
             R.string.genre_horror -> "Horror"
+            R.string.genre_musical -> "Musical"
+            R.string.genre_mystery -> "Mystery"
+            R.string.genre_romance -> "Romance"
+            R.string.genre_romcom -> "Romantic Comedy (Romcom)"
+            R.string.genre_sci_fi -> "Science Fiction (Sci-fi)"
+            R.string.genre_superhero -> "Superhero movie"
             R.string.genre_thriller -> "Thriller"
+            R.string.genre_war -> "War film"
+            R.string.genre_western -> "Western"
             else -> ""
         }
     }

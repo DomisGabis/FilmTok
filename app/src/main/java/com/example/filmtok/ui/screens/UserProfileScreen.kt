@@ -265,12 +265,26 @@ fun SectionHeader(title: String, icon: ImageVector) {
 @Composable
 fun GenreChip(genreKey: String) {
     val genreName = when (genreKey) {
-        "Sci-Fi" -> stringResource(R.string.genre_sci_fi)
         "Action" -> stringResource(R.string.genre_action)
-        "Drama" -> stringResource(R.string.genre_drama)
+        "Adventure" -> stringResource(R.string.genre_adventure)
+        "Animation / Animated film" -> stringResource(R.string.genre_animation)
+        "Biopic / Biographical film" -> stringResource(R.string.genre_biopic)
         "Comedy" -> stringResource(R.string.genre_comedy)
+        "Crime" -> stringResource(R.string.genre_crime)
+        "Disaster movie" -> stringResource(R.string.genre_disaster)
+        "Documentary" -> stringResource(R.string.genre_documentary)
+        "Drama" -> stringResource(R.string.genre_drama)
+        "Fantasy" -> stringResource(R.string.genre_fantasy)
         "Horror" -> stringResource(R.string.genre_horror)
+        "Musical" -> stringResource(R.string.genre_musical)
+        "Mystery" -> stringResource(R.string.genre_mystery)
+        "Romance" -> stringResource(R.string.genre_romance)
+        "Romantic Comedy (Romcom)" -> stringResource(R.string.genre_romcom)
+        "Science Fiction (Sci-fi)" -> stringResource(R.string.genre_sci_fi)
+        "Superhero movie" -> stringResource(R.string.genre_superhero)
         "Thriller" -> stringResource(R.string.genre_thriller)
+        "War film" -> stringResource(R.string.genre_war)
+        "Western" -> stringResource(R.string.genre_western)
         else -> genreKey
     }
     Surface(
