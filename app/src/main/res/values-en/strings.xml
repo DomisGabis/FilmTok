@@ -18,6 +18,11 @@
     <string name="profile_stats_watched">Watched</string>
     <string name="profile_stats_rating">Rating</string>
 
+    <string name="edit_username_title">Edit username</string>
+    <string name="username_label">Username</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+
     <!-- Search Screen -->
     <string name="search_placeholder">Search by title, director…</string>
     <string name="search_empty_hint">Start typing to discover movies</string>

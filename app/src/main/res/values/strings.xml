@@ -18,6 +18,11 @@
     <string name="profile_stats_watched">Obejrzane</string>
     <string name="profile_stats_rating">Ocena</string>
 
+    <string name="edit_username_title">Edytuj nazwę użytkownika</string>
+    <string name="username_label">Nazwa użytkownika</string>
+    <string name="save">Zapisz</string>
+    <string name="cancel">Anuluj</string>
+
     <!-- Search Screen -->
     <string name="search_placeholder">Szukaj po tytule, reżyserze...</string>
     <string name="search_empty_hint">Zacznij wpisywać, aby odkryć filmy</string>
