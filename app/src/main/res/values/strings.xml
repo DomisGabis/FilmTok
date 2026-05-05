@@ -18,6 +18,11 @@
     <string name="profile_stats_watched">Obejrzane</string>
     <string name="profile_stats_rating">Ocena</string>
 
+    <string name="edit_username_title">Edytuj nazwę użytkownika</string>
+    <string name="username_label">Nazwa użytkownika</string>
+    <string name="save">Zapisz</string>
+    <string name="cancel">Anuluj</string>
+
     <!-- Search Screen -->
     <string name="search_placeholder">Szukaj po tytule, reżyserze...</string>
     <string name="search_empty_hint">Zacznij wpisywać, aby odkryć filmy</string>
@@ -48,12 +53,26 @@
     <string name="movie_cast">Obsada</string>
     <!-- Search Genres -->
     <string name="genre_all">Wszystkie</string>
-    <string name="genre_sci_fi">Sci-Fi</string>
     <string name="genre_action">Akcja</string>
-    <string name="genre_drama">Dramat</string>
+    <string name="genre_adventure">Przygoda</string>
+    <string name="genre_animation">Animacja</string>
+    <string name="genre_biopic">Biograficzny</string>
     <string name="genre_comedy">Komedia</string>
+    <string name="genre_crime">Kryminał</string>
+    <string name="genre_disaster">Katastroficzny</string>
+    <string name="genre_documentary">Dokumentalny</string>
+    <string name="genre_drama">Dramat</string>
+    <string name="genre_fantasy">Fantasy</string>
     <string name="genre_horror">Horror</string>
+    <string name="genre_musical">Musical</string>
+    <string name="genre_mystery">Tajemnica</string>
+    <string name="genre_romance">Romans</string>
+    <string name="genre_romcom">Komedia romantyczna</string>
+    <string name="genre_sci_fi">Sci-Fi</string>
+    <string name="genre_superhero">Superbohaterowie</string>
     <string name="genre_thriller">Thriller</string>
+    <string name="genre_war">Wojenny</string>
+    <string name="genre_western">Western</string>
     <!-- Auth Screens -->
     <string name="login_title">Zaloguj się, aby zarządzać profilem</string>
     <string name="login_email_label">Email</string>

@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -56,6 +57,9 @@ fun AdminAddMovieScreen(
     }
     val videoLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         viewModel.onVideoUriChange(uri)
+    }
+    val castImageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        viewModel.onActorImageUriChange(uri)
     }
 
     LaunchedEffect(movieId) {
@@ -114,7 +118,11 @@ fun AdminAddMovieScreen(
                     onVideoClick = { videoLauncher.launch(arrayOf("video/*")) }
                 )
 
-                CastSection(uiState = uiState, viewModel = viewModel)
+                CastSection(
+                    uiState = uiState, 
+                    viewModel = viewModel,
+                    onPickCastImage = { castImageLauncher.launch(arrayOf("image/*")) }
+                )
 
                 Spacer(modifier = Modifier.height(80.dp))
             }
@@ -192,12 +200,9 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
             label = "Ocena (0-5)",
             placeholder = "5"
         )
-        AdminTextField(
-            value = uiState.genre,
-            onValueChange = viewModel::onGenreChange,
-            label = "Gatunek",
-            placeholder = "Sci-Fi, Akcja"
-        )
+        
+        GenresSection(selectedGenres = uiState.genres, onGenreToggle = viewModel::onGenreToggle)
+
         AdminTextField(
             value = uiState.description,
             onValueChange = viewModel::onDescriptionChange,
@@ -205,6 +210,46 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
             placeholder = "Krótki opis filmu...",
             minLines = 3
         )
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun GenresSection(selectedGenres: List<String>, onGenreToggle: (String) -> Unit) {
+    val genres = listOf(
+        "Action", "Adventure", "Animation / Animated film", "Biopic / Biographical film",
+        "Comedy", "Crime", "Disaster movie", "Documentary", "Drama", "Fantasy",
+        "Horror", "Musical", "Mystery", "Romance", "Romantic Comedy (Romcom)",
+        "Science Fiction (Sci-fi)", "Superhero movie", "Thriller", "War film", "Western"
+    )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = "Gatunki *", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            genres.forEach { genre ->
+                FilterChip(
+                    selected = selectedGenres.contains(genre),
+                    onClick = { onGenreToggle(genre) },
+                    label = { Text(genre, fontSize = 12.sp) },
+                    colors = FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = MaterialTheme.colorScheme.primary,
+                        selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        labelColor = MaterialTheme.colorScheme.onSurface
+                    ),
+                    border = FilterChipDefaults.filterChipBorder(
+                        enabled = true,
+                        selected = selectedGenres.contains(genre),
+                        borderColor = MaterialTheme.colorScheme.outline,
+                        selectedBorderColor = MaterialTheme.colorScheme.primary
+                    )
+                )
+            }
+        }
     }
 }
 
@@ -265,7 +310,11 @@ fun ImagesSection(
 }
 
 @Composable
-fun CastSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
+fun CastSection(
+    uiState: AdminMovieFormState, 
+    viewModel: AdminViewModel,
+    onPickCastImage: () -> Unit
+) {
     AdminSection(title = stringResource(R.string.admin_section_cast), icon = Icons.Default.Person) {
         AdminTextField(
             value = uiState.actorName,
@@ -277,10 +326,13 @@ fun CastSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
             onValueChange = viewModel::onActorRoleChange,
             label = "Rola w filmie"
         )
-        AdminTextField(
-            value = uiState.actorImageUrl,
-            onValueChange = viewModel::onActorImageUrlChange,
-            label = "URL zdjęcia aktora (opcjonalnie)"
+        
+        Text("Zdjęcie aktora", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+        ImagePickerBox(
+            uri = uiState.actorImageUri,
+            onClick = onPickCastImage,
+            label = "Dodaj zdjęcie aktora",
+            height = 100.dp
         )
         
         Button(
@@ -303,11 +355,27 @@ fun CastSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
 @Composable
 fun CastMemberItem(member: CastMember, onRemove: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text("${member.name} jako ${member.character}", color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            AsyncImage(
+                model = member.imageUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(member.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Text(member.character, color = Color.Gray, fontSize = 12.sp)
+            }
+        }
         IconButton(onClick = onRemove) {
             Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
         }

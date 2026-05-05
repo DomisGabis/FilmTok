@@ -1,6 +1,9 @@
 package com.example.filmtok.ui.screens
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,20 +22,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.example.filmtok.R
 import com.example.filmtok.model.Achievement
 import com.example.filmtok.model.User
-import androidx.compose.ui.res.stringResource
-import com.example.filmtok.R
+import com.example.filmtok.viewmodel.ProfileViewModel
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
-import androidx.compose.ui.platform.LocalContext
-import com.example.filmtok.viewmodel.ProfileViewModel
-import androidx.compose.foundation.clickable
+import android.net.Uri
 
 @Composable
 fun UserProfileScreen(
@@ -42,7 +45,16 @@ fun UserProfileScreen(
     viewModel: ProfileViewModel = viewModel()
 ) {
     val user by viewModel.user.collectAsState()
+    val isUploading by viewModel.isUploading.collectAsState()
     val scrollState = rememberScrollState()
+    var showEditUsernameDialog by remember { mutableStateOf(false) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocument(),
+        onResult = { uri ->
+            uri?.let { viewModel.updateProfilePicture(it) }
+        }
+    )
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         user?.let { currentUser ->
@@ -55,7 +67,14 @@ fun UserProfileScreen(
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
                 
-                ProfileHeader(currentUser)
+                ProfileHeader(
+                    user = currentUser,
+                    isUploading = isUploading,
+                    onImageClick = {
+                        photoPickerLauncher.launch(arrayOf("image/*"))
+                    },
+                    onEditUsernameClick = { showEditUsernameDialog = true }
+                )
                 
                 Spacer(modifier = Modifier.height(24.dp))
                 
@@ -90,6 +109,17 @@ fun UserProfileScreen(
                 
                 Spacer(modifier = Modifier.height(32.dp))
             }
+
+            if (showEditUsernameDialog) {
+                EditUsernameDialog(
+                    currentUsername = currentUser.username,
+                    onDismiss = { showEditUsernameDialog = false },
+                    onConfirm = { newUsername ->
+                        viewModel.updateUsername(newUsername)
+                        showEditUsernameDialog = false
+                    }
+                )
+            }
         } ?: Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
@@ -97,7 +127,44 @@ fun UserProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(user: User) {
+fun EditUsernameDialog(
+    currentUsername: String,
+    onDismiss: () -> Unit,
+    onConfirm: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(currentUsername) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.edit_username_title)) },
+        text = {
+            OutlinedTextField(
+                value = text,
+                onValueChange = { text = it },
+                label = { Text(stringResource(R.string.username_label)) },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(text) }) {
+                Text(stringResource(R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+@Composable
+fun ProfileHeader(
+    user: User,
+    isUploading: Boolean,
+    onImageClick: () -> Unit,
+    onEditUsernameClick: () -> Unit
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(
             modifier = Modifier
@@ -109,6 +176,8 @@ fun ProfileHeader(user: User) {
                     )
                 )
                 .padding(4.dp)
+                .clickable { onImageClick() },
+            contentAlignment = Alignment.Center
         ) {
             AsyncImage(
                 model = user.profileImageUrl,
@@ -118,19 +187,42 @@ fun ProfileHeader(user: User) {
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
+            if (isUploading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Color.White)
+                }
+            }
         }
         
         Spacer(modifier = Modifier.height(16.dp))
         
-        Text(
-            text = user.username,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = user.username,
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = onEditUsernameClick) {
+                Icon(
+                    imageVector = Icons.Default.Edit,
+                    contentDescription = "Edit Username",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
         
         Text(
-            text = user.name, // Używamy 'name' zamiast 'email' jeśli w modelu nie ma email
+            text = user.name,
             color = Color.Gray,
             fontSize = 14.sp
         )
@@ -173,12 +265,26 @@ fun SectionHeader(title: String, icon: ImageVector) {
 @Composable
 fun GenreChip(genreKey: String) {
     val genreName = when (genreKey) {
-        "Sci-Fi" -> stringResource(R.string.genre_sci_fi)
         "Action" -> stringResource(R.string.genre_action)
-        "Drama" -> stringResource(R.string.genre_drama)
+        "Adventure" -> stringResource(R.string.genre_adventure)
+        "Animation / Animated film" -> stringResource(R.string.genre_animation)
+        "Biopic / Biographical film" -> stringResource(R.string.genre_biopic)
         "Comedy" -> stringResource(R.string.genre_comedy)
+        "Crime" -> stringResource(R.string.genre_crime)
+        "Disaster movie" -> stringResource(R.string.genre_disaster)
+        "Documentary" -> stringResource(R.string.genre_documentary)
+        "Drama" -> stringResource(R.string.genre_drama)
+        "Fantasy" -> stringResource(R.string.genre_fantasy)
         "Horror" -> stringResource(R.string.genre_horror)
+        "Musical" -> stringResource(R.string.genre_musical)
+        "Mystery" -> stringResource(R.string.genre_mystery)
+        "Romance" -> stringResource(R.string.genre_romance)
+        "Romantic Comedy (Romcom)" -> stringResource(R.string.genre_romcom)
+        "Science Fiction (Sci-fi)" -> stringResource(R.string.genre_sci_fi)
+        "Superhero movie" -> stringResource(R.string.genre_superhero)
         "Thriller" -> stringResource(R.string.genre_thriller)
+        "War film" -> stringResource(R.string.genre_war)
+        "Western" -> stringResource(R.string.genre_western)
         else -> genreKey
     }
     Surface(

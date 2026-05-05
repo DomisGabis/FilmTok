@@ -47,6 +47,12 @@ class UserRepository(
         return result.user?.uid ?: error("Brak UID po logowaniu")
     }
 
+    suspend fun updateProfile(uid: String, updates: Map<String, Any>) {
+        db.collection("users").document(uid).update(updates).await()
+    }
+
+    fun getCurrentUserId(): String? = auth.currentUser?.uid
+
     fun signOut() {
         auth.signOut()
     }

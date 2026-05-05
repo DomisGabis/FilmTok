@@ -27,32 +27,34 @@ class HomeViewModel(
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     init {
-        fetchHomeData()
+        observeMovies()
+    }
+
+    private fun observeMovies() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            repository.getMoviesFlow().collect { movies ->
+                try {
+                    // Wybór filmu dnia (isHero lub pierwszy z listy)
+                    val hero = movies.find { it.isHero } ?: movies.firstOrNull()
+                    _heroMovie.value = hero?.let { storageRepository.resolveMovieUrls(it) }
+
+                    // Rozwiązanie URLi dla listy filmów (np. 10 ostatnich)
+                    val resolvedRecently = movies.take(10).map { movie ->
+                        async { storageRepository.resolveMovieUrls(movie) }
+                    }.awaitAll()
+
+                    _recentlyWatched.value = resolvedRecently
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        }
     }
 
     fun fetchHomeData() {
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val hero = repository.getHeroMovie()
-                val recently = repository.getRecentlyWatched()
-                
-                // Fallback do pierwszego filmu, jeśli żaden nie jest oznaczony jako Hero
-                val finalHero = hero ?: recently.firstOrNull()
-                
-                _heroMovie.value = finalHero?.let { storageRepository.resolveMovieUrls(it) }
-                
-                // Poprawne rozwiązanie URLi dla listy filmów
-                val resolvedRecently = recently.map { movie ->
-                    async { storageRepository.resolveMovieUrls(movie) }
-                }.awaitAll()
-                
-                _recentlyWatched.value = resolvedRecently
-            } catch (e: Exception) {
-                e.printStackTrace()
-            } finally {
-                _isLoading.value = false
-            }
-        }
+        observeMovies()
     }
 }
