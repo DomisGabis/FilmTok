@@ -1,6 +1,7 @@
 package com.example.filmtok.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.example.filmtok.R
 import com.google.firebase.auth.FirebaseAuth
@@ -41,11 +43,10 @@ fun LoginScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Person,
+        Image(
+            painter = painterResource(id = R.mipmap.ic_launcher_foreground),
             contentDescription = null,
-            modifier = Modifier.size(100.dp),
-            tint = Color.Gray
+            modifier = Modifier.size(200.dp)
         )
 
         Spacer(modifier = Modifier.height(24.dp))
