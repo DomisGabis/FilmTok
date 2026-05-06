@@ -13,7 +13,7 @@ val Pink40 = Color(0xFF7D5260)
 // FilmTok Dark Mode Palette
 val Background = Color(0xFF000000)
 val Surface = Color(0xFF121212)
-val Primary = Color(0xFFFF2D55) // TikTok-like Red/Pink
-val Secondary = Color(0xFF00F2EA) // TikTok-like Cyan
+val Primary = Color(0xFFFF2D55)
+val Secondary = Color(0xFF00F2EA)
 val TextPrimary = Color(0xFFFFFFFF)
 val TextSecondary = Color(0xFFB3B3B3)
