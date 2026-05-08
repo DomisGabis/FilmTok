@@ -53,16 +53,21 @@ fun ReelsScreen(
             modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 1
         ) { page ->
+            // Sprawdzamy, czy ta strona jest aktualnie aktywna
+            val isCurrentPage = pagerState.currentPage == page
+
             ReelItem(
                 movie = reels[page],
-                onSeeDetailsClick = onSeeDetailsClick
+                onSeeDetailsClick = onSeeDetailsClick,
+                isCurrentPage = isCurrentPage
             )
         }
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
-fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
+fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit, isCurrentPage: Boolean) {
     val context = LocalContext.current
     val exoPlayer = remember {
         ExoPlayer.Builder(context).build().apply {
@@ -70,12 +75,22 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
             setMediaItem(mediaItem)
             prepare()
             repeatMode = Player.REPEAT_MODE_ALL
-            playWhenReady = true
+            // Nie ustawiamy playWhenReady = true tutaj, zrobimy to w LaunchedEffect
         }
     }
 
     var isPlayerReady by remember { mutableStateOf(false) }
-    var isPlaying by remember { mutableStateOf(true) }
+    var isPlaying by remember { mutableStateOf(false) }
+
+    // Reagowanie na zmianę strony - odtwarzanie tylko gdy jesteśmy na widoku
+    LaunchedEffect(isCurrentPage) {
+        if (isCurrentPage) {
+            exoPlayer.play()
+        } else {
+            exoPlayer.pause()
+            exoPlayer.seekTo(0) // Opcjonalnie: wróć do początku gdy użytkownik przewinie dalej
+        }
+    }
 
     DisposableEffect(Unit) {
         val listener = object : Player.Listener {
@@ -138,7 +153,7 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
         )
 
         // Środkowa ikona Play (pokazuje się tylko gdy film jest zatrzymany)
-        if (!isPlaying) {
+        if (!isPlaying && isPlayerReady) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
                 contentDescription = null,
@@ -151,19 +166,18 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit) {
         }
 
         // Prawy panel z akcjami
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(bottom = 100.dp, end = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            ReelActionItem(Icons.Default.Favorite, movie.likesCount.toString())
-            Spacer(modifier = Modifier.height(20.dp))
-            // Używamy Ikony z tekstem jako placeholder dla komentarza
-            ReelActionItem(Icons.Default.PlayArrow, movie.commentsCount.toString(), "Koment.") 
-            Spacer(modifier = Modifier.height(20.dp))
-            ReelActionItem(Icons.Default.Share, "Udost.")
-        }
+//        Column(
+//            modifier = Modifier
+//                .align(Alignment.BottomEnd)
+//                .padding(bottom = 100.dp, end = 16.dp),
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            ReelActionItem(Icons.Default.Favorite, movie.likesCount.toString())
+//            Spacer(modifier = Modifier.height(20.dp))
+//            ReelActionItem(Icons.Default.PlayArrow, movie.commentsCount.toString(), "Koment.")
+//            Spacer(modifier = Modifier.height(20.dp))
+//            ReelActionItem(Icons.Default.Share, "Udost.")
+//        }
 
         // Dolny panel z opisem
         Column(
