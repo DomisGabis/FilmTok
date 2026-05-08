@@ -1,7 +1,11 @@
 package com.example.filmtok.data
 
+import com.example.filmtok.model.User
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 
 class UserRepository(
@@ -52,6 +56,65 @@ class UserRepository(
     }
 
     fun getCurrentUserId(): String? = auth.currentUser?.uid
+    fun getCurrentUserEmail(): String? = auth.currentUser?.email
+
+    suspend fun getCurrentUserProfileImage(): String? {
+        val uid = getCurrentUserId() ?: return null
+        return try {
+            val document = db.collection("users").document(uid).get().await()
+            document.getString("profileImageUrl")
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun getCurrentUserFavoriteMovies(): List<String> {
+        val uid = getCurrentUserId() ?: return emptyList()
+        return try {
+            val document = db.collection("users").document(uid).get().await()
+            @Suppress("UNCHECKED_CAST")
+            document.get("favoriteMovies") as? List<String> ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    suspend fun addFavoriteMovie(movieId: String) {
+        val uid = getCurrentUserId() ?: return
+        db.collection("users").document(uid)
+            .update("favoriteMovies", FieldValue.arrayUnion(movieId))
+            .await()
+    }
+
+    suspend fun removeFavoriteMovie(movieId: String) {
+        val uid = getCurrentUserId() ?: return
+        db.collection("users").document(uid)
+            .update("favoriteMovies", FieldValue.arrayRemove(movieId))
+            .await()
+    }
+
+    suspend fun isMovieFavorite(movieId: String): Boolean {
+        val favorites = getCurrentUserFavoriteMovies()
+        return favorites.contains(movieId)
+    }
+
+    suspend fun getCurrentUserTop3FavoriteGenres(): List<String> = coroutineScope {
+        val favoriteMovieIds = getCurrentUserFavoriteMovies()
+        val movieRepository = MovieRepository()
+
+        val favoriteMovies = favoriteMovieIds.map { id ->
+            async { movieRepository.getMovieDetails(id) }
+        }.awaitAll().filterNotNull()
+
+        favoriteMovies
+            .flatMap { it.genres }
+            .groupingBy { it }
+            .eachCount()
+            .entries
+            .sortedByDescending { it.value }
+            .take(3)
+            .map { it.key }
+    }
 
     fun signOut() {
         auth.signOut()

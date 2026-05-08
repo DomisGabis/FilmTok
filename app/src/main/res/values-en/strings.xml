@@ -86,4 +86,6 @@
     <string name="register_error_mismatch">Passwords do not match</string>
     <string name="register_error_too_short">Password must be at least 6 characters</string>
     <string name="register_error_prefix">Registration error: </string>
+    <string name="unknown_email">Unknown email</string>
+    <string name="no_favorite_movies">You don\'t have any favorite movies</string>
 </resources>

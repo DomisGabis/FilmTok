@@ -11,6 +11,11 @@ import kotlinx.coroutines.tasks.await
 class StorageRepository {
     private val storage = FirebaseStorage.getInstance()
 
+    fun getDefaultUserImageUrl(): String {
+        val ref = storage.reference.child("gs://filmtok-database.firebasestorage.app/assets/default_user_profile_image.png")
+        return ref.downloadUrl.toString()
+    }
+
     suspend fun uploadImage(uri: Uri, path: String, onProgress: (Float) -> Unit = {}): String {
         return uploadFile(uri, path, onProgress)
     }

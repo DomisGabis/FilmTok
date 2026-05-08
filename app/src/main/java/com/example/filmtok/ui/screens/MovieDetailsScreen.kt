@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -48,6 +50,7 @@ fun MovieDetailsScreen(
 ) {
     val movie by viewModel.movie.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+    val isFavorite by viewModel.isFavorite.collectAsState()
 
     LaunchedEffect(movieId) {
         viewModel.loadMovieDetails(movieId)
@@ -75,7 +78,11 @@ fun MovieDetailsScreen(
                         onBackClick = onBackClick,
                         onTrailerClick = { showTrailer = true }
                     )
-                    MovieInfoSection(movieData)
+                    MovieInfoSection(
+                        movie = movieData,
+                        isFavorite = isFavorite,
+                        onFavoriteToggle = { viewModel.toggleFavorite() }
+                    )
                     DescriptionSection(movieData.description)
                     GallerySection(movieData.gallery)
                     CastSection(movieData.cast)
@@ -205,24 +212,43 @@ fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
 }
 
 @Composable
-fun MovieInfoSection(movie: Movie) {
+fun MovieInfoSection(
+    movie: Movie,
+    isFavorite: Boolean,
+    onFavoriteToggle: () -> Unit
+) {
     Column(modifier = Modifier.padding(16.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            movie.genres.forEach { genre ->
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.padding(end = 8.dp)
-                ) {
-                    Text(
-                        text = genre,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                movie.genres.forEach { genre ->
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(
+                            text = genre,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
+            
+            IconButton(onClick = onFavoriteToggle) {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                    contentDescription = "Favorite",
+                    tint = if (isFavorite) Color(0xFFFF2D55) else MaterialTheme.colorScheme.onBackground
+                )
+            }
         }
+
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             text = movie.title,

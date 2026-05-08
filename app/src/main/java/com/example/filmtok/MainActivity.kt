@@ -66,7 +66,10 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
 
-                val showBottomBar = bottomBarItems.any { it.route == currentDestination?.route }
+                // Pasek nawigacji widoczny wszędzie poza ekranami logowania i rejestracji
+                val showBottomBar = currentDestination?.route != null &&
+                        currentDestination.route != Screen.Login.route &&
+                        currentDestination.route != Screen.Register.route
 
                 Scaffold(
                     bottomBar = {
@@ -85,10 +88,10 @@ class MainActivity : AppCompatActivity() {
                                         onClick = {
                                             navController.navigate(screen.route) {
                                                 popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
+                                                    saveState = false
                                                 }
                                                 launchSingleTop = true
-                                                restoreState = true
+                                                restoreState = false
                                             }
                                         },
                                         colors = NavigationBarItemDefaults.colors(
@@ -154,6 +157,9 @@ class MainActivity : AppCompatActivity() {
                                     navController.navigate(Screen.Login.route) {
                                         popUpTo(0)
                                     }
+                                },
+                                onMovieClick = { movieId ->
+                                    navController.navigate(Screen.MovieDetails.createRoute(movieId))
                                 }
                             )
                         }
@@ -225,5 +231,3 @@ fun PlaceholderScreen(name: String) {
         Text(text = "Ekran: $name", color = Color.White)
     }
 }
-
-

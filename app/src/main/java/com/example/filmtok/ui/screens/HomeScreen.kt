@@ -45,9 +45,7 @@ fun HomeScreen(
             }
         } else {
             LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = 80.dp)
+                modifier = Modifier.fillMaxSize()
             ) {
                 item {
                     Text(

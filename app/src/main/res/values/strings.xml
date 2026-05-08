@@ -100,4 +100,6 @@
     <string name="register_error_mismatch">Hasła nie są identyczne</string>
     <string name="register_error_too_short">Hasło musi mieć min. 6 znaków</string>
     <string name="register_error_prefix">Błąd rejestracji: </string>
+    <string name="unknown_email">Nieznany email</string>
+    <string name="no_favorite_movies">Nie masz żadnych ulubionych filmów</string>
 </resources>
