@@ -42,6 +42,12 @@
     <string name="admin_add_movie_title">Dodaj Film</string>
     <string name="admin_edit_movie_title">Edytuj Film</string>
     <string name="admin_form_subtitle">Wypełnij wszystkie pola</string>
+    <string name="admin_form_title">Tytuł</string>
+    <string name="admin_form_director">Reżyser</string>
+    <string name="admin_form_production_year">Rok produkcji</string>
+    <string name="admin_form_duration">Czas trwania (min.)</string>
+    <string name="admin_form_rating">Ocena (0-5)</string>
+    <string name="admin_form_description">Opis</string>
     <string name="admin_section_basic">Podstawowe informacje</string>
     <string name="admin_section_media">Plakaty, zdjęcia i wideo</string>
     <string name="admin_section_cast">Obsada</string>
@@ -102,4 +108,20 @@
     <string name="register_error_prefix">Błąd rejestracji: </string>
     <string name="unknown_email">Nieznany email</string>
     <string name="no_favorite_movies">Nie masz żadnych ulubionych filmów</string>
+    <string name="admin_form_genres">Gatunki</string>
+    <string name="admin_form_main_poster">Plakat Główny</string>
+    <string name="admin_form_click_to_add">Kliknij, aby dodać plakat</string>
+    <string name="admin_form_click_to_add_poster">Kliknij, aby dodać plakat</string>
+    <string name="admin_form_backdrop">Tło filmu</string>
+    <string name="admin_form_click_to_add_backdrop">Kliknij, aby dodać tło</string>
+    <string name="admin_form_trailer">Zwiastun</string>
+    <string name="admin_form_trailer_added">Zwiastun dodany</string>
+    <string name="admin_form_click_to_add_trailer">Kliknij, aby dodać zwiastun</string>
+    <string name="admin_form_actor_name">Imię i nazwisko aktora</string>
+    <string name="admin_form_role">Rola</string>
+    <string name="admin_form_actor_pictur">Zdjęcie aktora</string>
+    <string name="admin_form_actor_picture">Zdjęcie aktora</string>
+    <string name="admin_form_add_actor_picture">Dodaj zdjęcie aktora</string>
+    <string name="admin_form_add_actor">Dodaj aktora</string>
+    <string name="admin_form_sending_files">Wysyłanie plików</string>
 </resources>
