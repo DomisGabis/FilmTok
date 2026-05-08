@@ -1,5 +1,6 @@
 package com.example.filmtok.ui.screens
 
+import androidx.annotation.OptIn
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -33,7 +34,9 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import coil.compose.AsyncImage
 import com.example.filmtok.model.CastMember
@@ -152,16 +155,19 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit, onTrailerClick: () -> Uni
     }
 }
 
+@OptIn(UnstableApi::class)
 @Composable
 fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
     val exoPlayer = remember {
-        ExoPlayer.Builder(context).build().apply {
-            val mediaItem = MediaItem.fromUri(videoUrl)
-            setMediaItem(mediaItem)
-            prepare()
-            playWhenReady = true
-        }
+        ExoPlayer.Builder(context).build()
+    }
+
+    LaunchedEffect(videoUrl) {
+        val mediaItem = MediaItem.fromUri(videoUrl)
+        exoPlayer.setMediaItem(mediaItem)
+        exoPlayer.prepare()
+        exoPlayer.playWhenReady = true
     }
 
     DisposableEffect(Unit) {
@@ -182,17 +188,19 @@ fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
             color = Color.Black
         ) {
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .systemBarsPadding()
+                modifier = Modifier.fillMaxSize()
             ) {
                 AndroidView(
-                    factory = {
-                        PlayerView(it).apply {
+                    factory = { ctx ->
+                        PlayerView(ctx).apply {
                             player = exoPlayer
                             useController = true
-                            setBackgroundColor(0)
+                            resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
+                            setBackgroundColor(android.graphics.Color.BLACK)
                         }
+                    },
+                    update = { view ->
+                        view.resizeMode = AspectRatioFrameLayout.RESIZE_MODE_FIT
                     },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -200,7 +208,8 @@ fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
                 IconButton(
                     onClick = onDismiss,
                     modifier = Modifier
-                        .padding(top = 16.dp, end = 16.dp)
+                        .statusBarsPadding()
+                        .padding(16.dp)
                         .align(Alignment.TopEnd)
                         .background(Color.Black.copy(alpha = 0.5f), CircleShape)
                 ) {
