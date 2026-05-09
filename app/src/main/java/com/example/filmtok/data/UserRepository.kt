@@ -1,5 +1,7 @@
 package com.example.filmtok.data
 
+import androidx.annotation.VisibleForTesting
+import com.example.filmtok.model.Movie
 import com.example.filmtok.model.MovieGenre
 import com.example.filmtok.model.User
 import com.google.firebase.auth.FirebaseAuth
@@ -107,17 +109,23 @@ class UserRepository(
             async { movieRepository.getMovieDetails(id) }
         }.awaitAll().filterNotNull()
 
-        favoriteMovies
-            .flatMap { it.genres }
-            .groupingBy { it }
-            .eachCount()
-            .entries
-            .sortedByDescending { it.value }
-            .take(3)
-            .map { it.key }
+        getTop3FavoriteGenres(favoriteMovies)
     }
 
     fun signOut() {
         auth.signOut()
+    }
+
+    companion object {
+        fun getTop3FavoriteGenres(movies: List<Movie>): List<MovieGenre> {
+            return movies
+                .flatMap { it.genres }
+                .groupingBy { it }
+                .eachCount()
+                .entries
+                .sortedByDescending { it.value }
+                .take(3)
+                .map { it.key }
+        }
     }
 }

@@ -25,13 +25,7 @@ class SearchViewModel(
     val genres = MovieGenre.entries.map { it.labelRes }
 
     val filteredMovies: StateFlow<List<Movie>> = combine(_searchQuery, _selectedGenre, _allMovies) { query, genreRes, movies ->
-        movies.filter { movie ->
-            val matchesQuery = movie.title.contains(query, ignoreCase = true) || 
-                             movie.director.contains(query, ignoreCase = true)
-            
-            val matchesGenre = genreRes == R.string.genre_all || movie.genres.any { it.labelRes.equals(genreRes) }
-            matchesQuery && matchesGenre
-        }
+        filterMovies(movies, query, genreRes)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     init {
@@ -55,5 +49,17 @@ class SearchViewModel(
 
     fun onGenreSelect(genreRes: Int) {
         _selectedGenre.value = genreRes
+    }
+
+    companion object {
+        fun filterMovies(movies: List<Movie>, query: String, genreResId: Int): List<Movie> {
+            return movies.filter { movie ->
+                val matchesQuery = movie.title.contains(query, ignoreCase = true) || 
+                                 movie.director.contains(query, ignoreCase = true)
+                
+                val matchesGenre = genreResId == R.string.genre_all || movie.genres.any { it.labelRes == genreResId }
+                matchesQuery && matchesGenre
+            }
+        }
     }
 }
