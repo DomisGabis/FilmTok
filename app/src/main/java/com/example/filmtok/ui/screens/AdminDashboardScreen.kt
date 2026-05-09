@@ -76,7 +76,8 @@ fun AdminDashboardScreen(
                 Icon(Icons.Default.Add, contentDescription = stringResource(R.string.admin_dashboard_add_movie))
             }
         },
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        contentWindowInsets = WindowInsets(0, 0, 0, 0)
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(padding)) {
             when {
