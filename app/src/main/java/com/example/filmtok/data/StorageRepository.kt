@@ -7,13 +7,20 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.tasks.await
+import android.util.Log
 
 class StorageRepository {
     private val storage = FirebaseStorage.getInstance()
 
-    fun getDefaultUserImageUrl(): String {
-        val ref = storage.reference.child("assets/default_user_profile_image.png")
-        return ref.downloadUrl.toString()
+    suspend fun getDefaultUserImageUrl(): String {
+        return try {
+            val ref = storage.reference.child("assets/default_user_profile_image.png")
+            val uri = ref.downloadUrl.await()
+            uri.toString()
+        } catch (e: Exception) {
+            Log.e("FirebaseStorage", "Błąd pobierania default image", e)
+            ""
+        }
     }
 
     suspend fun uploadImage(uri: Uri, path: String, onProgress: (Float) -> Unit = {}): String {

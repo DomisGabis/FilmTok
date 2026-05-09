@@ -1,10 +1,8 @@
 package com.example.filmtok.viewmodel
 
 import android.net.Uri
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.filmtok.R
 import com.example.filmtok.data.MovieRepository
 import com.example.filmtok.data.StorageRepository
 import com.example.filmtok.data.UserRepository
@@ -39,7 +37,8 @@ class ProfileViewModel(
         viewModelScope.launch {
             val userId = userRepository.getCurrentUserId()
             val email = userRepository.getCurrentUserEmail() ?: ""
-            val profileImageUrl = userRepository.getCurrentUserProfileImage() ?: storageRepository.getDefaultUserImageUrl()
+            val profileImageUrlInitial = userRepository.getCurrentUserProfileImage()
+            val profileImageUrlFinal = profileImageUrlInitial ?: storageRepository.getDefaultUserImageUrl()
             val favoriteMovieIds = userRepository.getCurrentUserFavoriteMovies()
             val favoriteGenres = userRepository.getCurrentUserTop3FavoriteGenres()
 
@@ -47,7 +46,7 @@ class ProfileViewModel(
                 _user.value = User(
                     id = userId,
                     email = email,
-                    profileImageUrl = profileImageUrl,
+                    profileImageUrl = profileImageUrlFinal,
                     favoriteMovies = favoriteMovieIds,
                     favoriteGenres = favoriteGenres
                 )
