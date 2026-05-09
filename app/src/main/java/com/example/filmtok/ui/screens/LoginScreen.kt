@@ -106,8 +106,6 @@ fun LoginScreen(
                         .addOnCompleteListener { task ->
                             isLoading = false
                             if (task.isSuccessful) {
-                                // Po sukcesie logowania, przekazujemy UID do MainActivity
-                                // tam nastąpi sprawdzenie roli w Firestore
                                 onLoginSuccess(task.result?.user?.uid ?: "")
                             } else {
                                 errorMessage = context.getString(R.string.login_error_prefix) + (task.exception?.message ?: "Unknown")

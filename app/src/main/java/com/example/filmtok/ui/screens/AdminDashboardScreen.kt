@@ -35,7 +35,6 @@ fun AdminDashboardScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val errorMessage by viewModel.errorMessage.collectAsState()
 
-    // Pobieramy dane tylko gdy wchodzimy na ten ekran
     LaunchedEffect(Unit) {
         viewModel.loadMovies()
     }
@@ -63,7 +62,7 @@ fun AdminDashboardScreen(
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface),
                 actions = {
                     IconButton(onClick = onLogout) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Wyloguj", tint = Color.Gray)
+                        Icon(Icons.Default.ExitToApp, contentDescription = stringResource(R.string.admin_dashboard_logout), tint = Color.Gray)
                     }
                 }
             )
@@ -74,7 +73,7 @@ fun AdminDashboardScreen(
                 containerColor = Color(0xFFFF2D55),
                 contentColor = Color.White
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Dodaj film")
+                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.admin_dashboard_add_movie))
             }
         },
         containerColor = MaterialTheme.colorScheme.background
@@ -89,7 +88,7 @@ fun AdminDashboardScreen(
                 }
                 errorMessage != null -> {
                     Text(
-                        text = errorMessage ?: "Wystąpił błąd",
+                        text = errorMessage ?: stringResource(R.string.admin_dashboard_error_occurred),
                         color = Color.Gray,
                         modifier = Modifier.align(Alignment.Center),
                         fontSize = 14.sp
@@ -160,10 +159,10 @@ fun MovieAdminItem(
             
             Row {
                 IconButton(onClick = onEdit) {
-                    Icon(Icons.Default.Edit, contentDescription = "Edytuj", tint = MaterialTheme.colorScheme.onSurface)
+                    Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.admin_dashboard_edit), tint = MaterialTheme.colorScheme.onSurface)
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Default.Delete, contentDescription = "Usuń", tint = MaterialTheme.colorScheme.primary)
+                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.admin_dashboard_delete), tint = MaterialTheme.colorScheme.primary)
                 }
             }
         }

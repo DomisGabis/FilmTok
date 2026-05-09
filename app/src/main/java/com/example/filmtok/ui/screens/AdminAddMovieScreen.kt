@@ -110,7 +110,7 @@ fun AdminAddMovieScreen(
                     )
                 }
 
-    BasicInfoSection(uiState = uiState, viewModel = viewModel)
+                BasicInfoSection(uiState = uiState, viewModel = viewModel)
 
                 ImagesSection(
                     uiState = uiState,
@@ -168,14 +168,14 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
         AdminTextField(
             value = uiState.title,
             onValueChange = viewModel::onTitleChange,
-            label = R.string.admin_form_title.toString()+" *",
-            placeholder = R.string.admin_form_title.toString()
+            label = stringResource(R.string.admin_form_title) + " *",
+            placeholder = stringResource(R.string.admin_form_title)
         )
         AdminTextField(
             value = uiState.director,
             onValueChange = viewModel::onDirectorChange,
-            label = R.string.admin_form_director.toString()+" *",
-            placeholder = R.string.admin_form_director.toString()
+            label = stringResource(R.string.admin_form_director) + " *",
+            placeholder = stringResource(R.string.admin_form_director)
         )
         
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -183,14 +183,14 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
                 modifier = Modifier.weight(1f),
                 value = uiState.year,
                 onValueChange = viewModel::onYearChange,
-                label = R.string.admin_form_production_year.toString(),
+                label = stringResource(R.string.admin_form_production_year),
                 placeholder = "0000"
             )
             AdminTextField(
                 modifier = Modifier.weight(1f),
                 value = uiState.duration,
                 onValueChange = viewModel::onDurationChange,
-                label = R.string.admin_form_duration.toString(),
+                label = stringResource(R.string.admin_form_duration),
                 placeholder = "000"
             )
         }
@@ -198,7 +198,7 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
         AdminTextField(
             value = uiState.rating,
             onValueChange = viewModel::onRatingChange,
-            label = R.string.admin_form_rating.toString(),
+            label = stringResource(R.string.admin_form_rating),
             placeholder = "0.00"
         )
         
@@ -207,8 +207,8 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
         AdminTextField(
             value = uiState.description,
             onValueChange = viewModel::onDescriptionChange,
-            label = R.string.admin_form_description.toString(),
-            placeholder = R.string.admin_form_description.toString(),
+            label = stringResource(R.string.admin_form_description),
+            placeholder = stringResource(R.string.admin_form_description),
             minLines = 3
         )
     }
@@ -216,11 +216,11 @@ fun BasicInfoSection(uiState: AdminMovieFormState, viewModel: AdminViewModel) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun GenresSection(selectedGenres: List<String>, onGenreToggle: (String) -> Unit) {
-    val genres = MovieGenre.entries.map { stringResource(it.labelRes) }
+fun GenresSection(selectedGenres: List<MovieGenre>, onGenreToggle: (MovieGenre) -> Unit) {
+    val genres = MovieGenre.entries
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = R.string.admin_form_genres.toString()+" *", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
+        Text(text = stringResource(R.string.admin_form_genres) + " *", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -230,7 +230,7 @@ fun GenresSection(selectedGenres: List<String>, onGenreToggle: (String) -> Unit)
                 FilterChip(
                     selected = selectedGenres.contains(genre),
                     onClick = { onGenreToggle(genre) },
-                    label = { Text(genre, fontSize = 12.sp) },
+                    label = { Text(stringResource(genre.labelRes), fontSize = 12.sp) },
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = MaterialTheme.colorScheme.primary,
                         selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
@@ -257,28 +257,28 @@ fun ImagesSection(
     onVideoClick: () -> Unit
 ) {
     AdminSection(title = stringResource(R.string.admin_section_media), icon = Icons.Default.ThumbUp) {
-        Text(R.string.admin_form_main_poster.toString(), color = Color.Gray, fontSize = 14.sp)
+        Text(stringResource(R.string.admin_form_main_poster), color = Color.Gray, fontSize = 14.sp)
         ImagePickerBox(
             uri = uiState.posterUri, 
             existingUrl = uiState.existingPosterUrl,
             onClick = onPosterClick, 
-            label = R.string.admin_form_click_to_add_poster.toString()
+            label = stringResource(R.string.admin_form_click_to_add_poster)
         )
         
         Spacer(modifier = Modifier.height(12.dp))
         
-        Text(R.string.admin_form_backdrop.toString(), color = Color.Gray, fontSize = 14.sp)
+        Text(stringResource(R.string.admin_form_backdrop), color = Color.Gray, fontSize = 14.sp)
         ImagePickerBox(
             uri = uiState.backdropUri, 
             existingUrl = uiState.existingBackdropUrl,
             onClick = onBackdropClick, 
-            label = R.string.admin_form_click_to_add_backdrop.toString(),
+            label = stringResource(R.string.admin_form_click_to_add_backdrop),
             height = 150.dp
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        Text(R.string.admin_form_trailer.toString(), color = Color.Gray, fontSize = 14.sp)
+        Text(stringResource(R.string.admin_form_trailer), color = Color.Gray, fontSize = 14.sp)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -296,7 +296,7 @@ fun ImagesSection(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) R.string.admin_form_trailer_added.toString() else R.string.admin_form_click_to_add_trailer.toString(),
+                    text = if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) stringResource(R.string.admin_form_trailer_added) else stringResource(R.string.admin_form_click_to_add_trailer),
                     color = if (uiState.videoUri != null || uiState.existingVideoUrl.isNotEmpty()) Color.White else Color.Gray,
                     fontSize = 12.sp
                 )
@@ -315,19 +315,19 @@ fun CastSection(
         AdminTextField(
             value = uiState.actorName,
             onValueChange = viewModel::onActorNameChange,
-            label = R.string.admin_form_actor_name.toString()
+            label = stringResource(R.string.admin_form_actor_name)
         )
         AdminTextField(
             value = uiState.actorRole,
             onValueChange = viewModel::onActorRoleChange,
-            label = R.string.admin_form_role.toString()
+            label = stringResource(R.string.admin_form_role)
         )
         
-        Text(R.string.admin_form_actor_picture.toString(), color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
+        Text(stringResource(R.string.admin_form_actor_picture), color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(start = 4.dp))
         ImagePickerBox(
             uri = uiState.actorImageUri,
             onClick = onPickCastImage,
-            label = R.string.admin_form_add_actor_picture.toString(),
+            label = stringResource(R.string.admin_form_add_actor_picture),
             height = 100.dp
         )
         
@@ -339,7 +339,7 @@ fun CastSection(
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text(R.string.admin_form_add_actor.toString())
+            Text(stringResource(R.string.admin_form_add_actor))
         }
 
         uiState.castMembers.forEach { member ->
@@ -394,7 +394,7 @@ fun SaveButton(
     ) {
         if (isLoading && uploadProgress > 0f) {
             Text(
-                text = R.string.admin_form_sending_files.toString()+": ${(uploadProgress * 100).toInt()}%",
+                text = stringResource(R.string.admin_form_sending_files) + ": ${(uploadProgress * 100).toInt()}%",
                 color = Color.White,
                 fontSize = 12.sp
             )

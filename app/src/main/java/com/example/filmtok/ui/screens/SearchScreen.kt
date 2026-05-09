@@ -24,6 +24,7 @@ import coil.compose.AsyncImage
 import com.example.filmtok.model.Movie
 import androidx.compose.ui.res.stringResource
 import com.example.filmtok.R
+import com.example.filmtok.model.MovieGenre
 import com.example.filmtok.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +43,6 @@ fun SearchScreen(
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
     ) {
-        // Pasek wyszukiwania
         OutlinedTextField(
             value = searchQuery,
             onValueChange = { viewModel.onSearchQueryChange(it) },
@@ -94,7 +94,6 @@ fun SearchScreen(
             }
         }
 
-        // Lista wyników
         if (searchQuery.isEmpty() && filteredMovies.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -163,7 +162,7 @@ fun SearchMovieItem(movie: Movie, onClick: () -> Unit) {
                         shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
-                            text = genre,
+                            text = stringResource(genre.labelRes),
                             color = Color.LightGray,
                             fontSize = 10.sp,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)

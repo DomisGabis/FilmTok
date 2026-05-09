@@ -1,5 +1,6 @@
 package com.example.filmtok.data
 
+import com.example.filmtok.model.MovieGenre
 import com.example.filmtok.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -98,7 +99,7 @@ class UserRepository(
         return favorites.contains(movieId)
     }
 
-    suspend fun getCurrentUserTop3FavoriteGenres(): List<String> = coroutineScope {
+    suspend fun getCurrentUserTop3FavoriteGenres(): List<MovieGenre> = coroutineScope {
         val favoriteMovieIds = getCurrentUserFavoriteMovies()
         val movieRepository = MovieRepository()
 

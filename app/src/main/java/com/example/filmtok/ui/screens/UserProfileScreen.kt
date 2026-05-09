@@ -30,10 +30,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import com.example.filmtok.R
 import com.example.filmtok.model.User
-import com.example.filmtok.model.Movie
 import com.example.filmtok.viewmodel.ProfileViewModel
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import com.example.filmtok.model.MovieGenre
 
 @Composable
 fun UserProfileScreen(
@@ -66,7 +66,6 @@ fun UserProfileScreen(
             ) {
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 1. ZDJĘCIE PROFILOWE
                 ProfileImageSection(
                     user = currentUser,
                     isUploading = isUploading,
@@ -75,7 +74,6 @@ fun UserProfileScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // 2. ADRES E-MAIL
                 Text(
                     text = currentUser.email,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -85,12 +83,10 @@ fun UserProfileScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 3. LICZBA POLUBIONYCH FILMÓW
                 FavoriteMoviesCounter(count = currentUser.favoriteMovies.size)
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // 4. KARUZELA POLUBIONYCH FILMÓW
                 if (favoriteMovies.isNotEmpty()) {
                     LazyRow(
                         contentPadding = PaddingValues(horizontal = 4.dp),
@@ -105,7 +101,6 @@ fun UserProfileScreen(
                         }
                     }
                 } else if (currentUser.favoriteMovies.isNotEmpty()) {
-                    // Wyświetl loader jeśli lista IDs nie jest pusta, ale filmy jeszcze się ładują
                     Box(modifier = Modifier.fillMaxWidth().height(180.dp), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(modifier = Modifier.size(32.dp))
                     }
@@ -119,7 +114,6 @@ fun UserProfileScreen(
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // 5. ULUBIONE GATUNKI
                 SectionHeader(title = stringResource(R.string.profile_favorite_genres), icon = Icons.Default.Favorite)
                 Spacer(modifier = Modifier.height(12.dp))
                 LazyRow(
@@ -133,7 +127,6 @@ fun UserProfileScreen(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
-                // USTAWIENIA (Język, Dark Mode, Log out)
                 SettingsSection(
                     isDarkMode = isDarkMode,
                     onDarkModeChange = onDarkModeChange,
@@ -161,7 +154,7 @@ fun ProfileImageSection(user: User, isUploading: Boolean, onImageClick: () -> Un
     ) {
         AsyncImage(
             model = user.profileImageUrl,
-            contentDescription = "Profile Picture",
+            contentDescription = stringResource(R.string.profile_image),
             modifier = Modifier.fillMaxSize().clip(CircleShape),
             contentScale = ContentScale.Crop
         )
@@ -186,7 +179,7 @@ fun FavoriteMoviesCounter(count: Int) {
         Icon(Icons.Default.ThumbUp, contentDescription = null, tint = Color(0xFFFF2D55), modifier = Modifier.size(20.dp))
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "Polubione filmy: $count",
+            text = stringResource(R.string.favorite_movies)+": $count",
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
@@ -333,30 +326,8 @@ fun SettingsSection(
 }
 
 @Composable
-fun GenreChip(genreKey: String) {
-    val genreName = when (genreKey) {
-        "Action" -> stringResource(R.string.genre_action)
-        "Adventure" -> stringResource(R.string.genre_adventure)
-        "Animation / Animated film" -> stringResource(R.string.genre_animation)
-        "Biopic / Biographical film" -> stringResource(R.string.genre_biopic)
-        "Comedy" -> stringResource(R.string.genre_comedy)
-        "Crime" -> stringResource(R.string.genre_crime)
-        "Disaster movie" -> stringResource(R.string.genre_disaster)
-        "Documentary" -> stringResource(R.string.genre_documentary)
-        "Drama" -> stringResource(R.string.genre_drama)
-        "Fantasy" -> stringResource(R.string.genre_fantasy)
-        "Horror" -> stringResource(R.string.genre_horror)
-        "Musical" -> stringResource(R.string.genre_musical)
-        "Mystery" -> stringResource(R.string.genre_mystery)
-        "Romance" -> stringResource(R.string.genre_romance)
-        "Romantic Comedy (Romcom)" -> stringResource(R.string.genre_romcom)
-        "Science Fiction (Sci-fi)" -> stringResource(R.string.genre_sci_fi)
-        "Superhero movie" -> stringResource(R.string.genre_superhero)
-        "Thriller" -> stringResource(R.string.genre_thriller)
-        "War film" -> stringResource(R.string.genre_war)
-        "Western" -> stringResource(R.string.genre_western)
-        else -> genreKey
-    }
+fun GenreChip(genre: MovieGenre) {
+    val genreName = stringResource(genre.labelRes)
     Surface(
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(20.dp),

@@ -12,7 +12,7 @@ class StorageRepository {
     private val storage = FirebaseStorage.getInstance()
 
     fun getDefaultUserImageUrl(): String {
-        val ref = storage.reference.child("gs://filmtok-database.firebasestorage.app/assets/default_user_profile_image.png")
+        val ref = storage.reference.child("assets/default_user_profile_image.png")
         return ref.downloadUrl.toString()
     }
 

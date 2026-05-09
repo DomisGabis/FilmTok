@@ -88,14 +88,6 @@
     <string name="login_empty_fields">Uzupełnij wszystkie pola</string>
     <string name="login_error_prefix">Błąd logowania: </string>
 
-    <!-- Achievements -->
-    <string name="achievement_collector_title">Kolekcjoner</string>
-    <string name="achievement_collector_desc">Dodaj 50 filmów do biblioteki</string>
-    <string name="achievement_critic_title">Krytyk</string>
-    <string name="achievement_critic_desc">Wystaw 100 ocen</string>
-    <string name="achievement_marathoner_title">Maratończyk</string>
-    <string name="achievement_marathoner_desc">Oglądaj przez 10h bez przerwy</string>
-
     <string name="register_title">Dołącz do FilmTok</string>
     <string name="register_subtitle">Stwórz konto, aby odkrywać filmy</string>
     <string name="register_confirm_password_label">Powtórz hasło</string>
@@ -110,7 +102,6 @@
     <string name="no_favorite_movies">Nie masz żadnych ulubionych filmów</string>
     <string name="admin_form_genres">Gatunki</string>
     <string name="admin_form_main_poster">Plakat Główny</string>
-    <string name="admin_form_click_to_add">Kliknij, aby dodać plakat</string>
     <string name="admin_form_click_to_add_poster">Kliknij, aby dodać plakat</string>
     <string name="admin_form_backdrop">Tło filmu</string>
     <string name="admin_form_click_to_add_backdrop">Kliknij, aby dodać tło</string>
@@ -119,9 +110,20 @@
     <string name="admin_form_click_to_add_trailer">Kliknij, aby dodać zwiastun</string>
     <string name="admin_form_actor_name">Imię i nazwisko aktora</string>
     <string name="admin_form_role">Rola</string>
-    <string name="admin_form_actor_pictur">Zdjęcie aktora</string>
     <string name="admin_form_actor_picture">Zdjęcie aktora</string>
     <string name="admin_form_add_actor_picture">Dodaj zdjęcie aktora</string>
     <string name="admin_form_add_actor">Dodaj aktora</string>
     <string name="admin_form_sending_files">Wysyłanie plików</string>
+    <string name="admin_dashboard_logout">Wyloguj</string>
+    <string name="admin_dashboard_add_movie">Dodaj film</string>
+    <string name="admin_dashboard_error_occurred">Wystąpił błąd</string>
+    <string name="admin_dashboard_edit">Edytuj</string>
+    <string name="admin_dashboard_delete">Usuń</string>
+    <string name="movie_details_back">Powrót</string>
+    <string name="movie_details_close">Zamknij</string>
+    <string name="movie_details_favorite">Ulubiony</string>
+    <string name="movie_details_unknown_genre">Nieznany</string>
+    <string name="reels_see_details">Zobacz szczegóły</string>
+    <string name="profile_image">Zdjęcie profilowe\n</string>
+    <string name="favorite_movies">Ulubione filmy</string>
 </resources>

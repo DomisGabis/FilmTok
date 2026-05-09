@@ -7,6 +7,7 @@ import com.example.filmtok.data.MovieRepository
 import com.example.filmtok.data.StorageRepository
 import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
+import com.example.filmtok.model.MovieGenre
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,7 @@ data class AdminMovieFormState(
     val year: String = "",
     val duration: String = "",
     val rating: String = "",
-    val genres: List<String> = emptyList(),
+    val genres: List<MovieGenre> = emptyList(),
     val description: String = "",
     val posterUri: Uri? = null,
     val backdropUri: Uri? = null,
@@ -133,7 +134,7 @@ class AdminViewModel(
     fun onYearChange(value: String) = _uiState.update { it.copy(year = value) }
     fun onDurationChange(value: String) = _uiState.update { it.copy(duration = value) }
     fun onRatingChange(value: String) = _uiState.update { it.copy(rating = value) }
-    fun onGenreToggle(genre: String) = _uiState.update { state ->
+    fun onGenreToggle(genre: MovieGenre) = _uiState.update { state ->
         val currentGenres = state.genres
         val newGenres = if (currentGenres.contains(genre)) {
             currentGenres - genre

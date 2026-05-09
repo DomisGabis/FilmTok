@@ -1,6 +1,7 @@
 package com.example.filmtok.viewmodel
 
 import android.net.Uri
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.filmtok.R
@@ -37,7 +38,7 @@ class ProfileViewModel(
     private fun loadUserData() {
         viewModelScope.launch {
             val userId = userRepository.getCurrentUserId()
-            val email = userRepository.getCurrentUserEmail() ?: R.string.unknown_email.toString()
+            val email = userRepository.getCurrentUserEmail() ?: ""
             val profileImageUrl = userRepository.getCurrentUserProfileImage() ?: storageRepository.getDefaultUserImageUrl()
             val favoriteMovieIds = userRepository.getCurrentUserFavoriteMovies()
             val favoriteGenres = userRepository.getCurrentUserTop3FavoriteGenres()

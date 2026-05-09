@@ -82,14 +82,6 @@
     <string name="login_empty_fields">Fill all fields</string>
     <string name="login_error_prefix">Login error: </string>
 
-    <!-- Achievements -->
-    <string name="achievement_collector_title">Collector</string>
-    <string name="achievement_collector_desc">Add 50 movies to the library</string>
-    <string name="achievement_critic_title">Critic</string>
-    <string name="achievement_critic_desc">Give 100 ratings</string>
-    <string name="achievement_marathoner_title">Marathoner</string>
-    <string name="achievement_marathoner_desc">Watch for 10 hours without a break</string>
-
     <string name="register_title">Join FilmTok</string>
     <string name="register_subtitle">Create an account to discover movies</string>
     <string name="register_confirm_password_label">Confirm password</string>
@@ -108,20 +100,30 @@
     <string name="admin_form_duration">Duration (min.)</string>
     <string name="admin_form_rating">Rating (0-5)</string>
     <string name="admin_form_description">Description</string>
-    <string name="admin_form_genres">Gatunki</string>
-    <string name="admin_form_main_poster">Plakat Główny</string>
-    <string name="admin_form_click_to_add">Kliknij, aby dodać plakat</string>
-    <string name="admin_form_click_to_add_poster">Kliknij, aby dodać plakat</string>
-    <string name="admin_form_backdrop">Tło filmu</string>
-    <string name="admin_form_click_to_add_backdrop">Kliknij, aby dodać tło</string>
-    <string name="admin_form_trailer">Zwiastun</string>
-    <string name="admin_form_trailer_added">Zwiastun dodany</string>
-    <string name="admin_form_click_to_add_trailer">Kliknij, aby dodać zwiastun</string>
-    <string name="admin_form_actor_name">Imię i nazwisko aktora</string>
-    <string name="admin_form_role">Rola</string>
-    <string name="admin_form_actor_pictur">Zdjęcie aktora</string>
-    <string name="admin_form_actor_picture">Zdjęcie aktora</string>
-    <string name="admin_form_add_actor_picture">Dodaj zdjęcie aktora</string>
-    <string name="admin_form_add_actor">Dodaj aktora</string>
-    <string name="admin_form_sending_files">Wysyłanie plików</string>
+    <string name="admin_form_genres">Genres</string>
+    <string name="admin_form_main_poster">Main Poster</string>
+    <string name="admin_form_click_to_add_poster">Click to add poster</string>
+    <string name="admin_form_backdrop">Backdrop</string>
+    <string name="admin_form_click_to_add_backdrop">Click to add backdrop</string>
+    <string name="admin_form_trailer">Trailer</string>
+    <string name="admin_form_trailer_added">Trailer added</string>
+    <string name="admin_form_click_to_add_trailer">Click to add trailer</string>
+    <string name="admin_form_actor_name">Actor\'s name</string>
+    <string name="admin_form_role">Role</string>
+    <string name="admin_form_actor_picture">Actor\'s picture</string>
+    <string name="admin_form_add_actor_picture">Add actor\'s picture</string>
+    <string name="admin_form_add_actor">Add actor</string>
+    <string name="admin_form_sending_files">Sending files</string>
+    <string name="admin_dashboard_logout">Log out</string>
+    <string name="admin_dashboard_add_movie">Add movie</string>
+    <string name="admin_dashboard_error_occurred">Error occurred</string>
+    <string name="admin_dashboard_edit">Edit</string>
+    <string name="admin_dashboard_delete">Delete</string>
+    <string name="movie_details_back">Back</string>
+    <string name="movie_details_close">Close</string>
+    <string name="movie_details_favorite">Favorite</string>
+    <string name="movie_details_unknown_genre">Unknown</string>
+    <string name="reels_see_details">See details</string>
+    <string name="profile_image">Profile image</string>
+    <string name="favorite_movies">Favorite movies</string>
 </resources>

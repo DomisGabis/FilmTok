@@ -131,7 +131,7 @@ fun HeroSection(movie: Movie, onMovieClick: () -> Unit) {
             Row {
                 movie.genres.forEachIndexed { index, genre ->
                     Text(
-                        text = genre,
+                        text = stringResource(genre.labelRes),
                         style = MaterialTheme.typography.bodyMedium,
                         color = Color.LightGray
                     )

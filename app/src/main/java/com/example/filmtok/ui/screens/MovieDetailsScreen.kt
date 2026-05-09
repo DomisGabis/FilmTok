@@ -43,6 +43,7 @@ import com.example.filmtok.model.CastMember
 import com.example.filmtok.model.Movie
 import androidx.compose.ui.res.stringResource
 import com.example.filmtok.R
+import com.example.filmtok.model.MovieGenre
 import com.example.filmtok.viewmodel.MovieDetailsViewModel
 
 @Composable
@@ -134,7 +135,7 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit, onTrailerClick: () -> Uni
                 .padding(top = 48.dp, start = 16.dp)
                 .background(Color.Black.copy(alpha = 0.5f), CircleShape)
         ) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+            Icon(Icons.Default.ArrowBack, contentDescription = stringResource(R.string.movie_details_back), tint = Color.White)
         }
 
         // Action Button (Trailer)
@@ -213,7 +214,7 @@ fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
                         .align(Alignment.TopEnd)
                         .background(Color.Black.copy(alpha = 0.5f), CircleShape)
                 ) {
-                    Icon(Icons.Default.Close, contentDescription = "Close", tint = Color.White)
+                    Icon(Icons.Default.Close, contentDescription = stringResource(R.string.movie_details_close), tint = Color.White)
                 }
             }
         }
@@ -233,14 +234,14 @@ fun MovieInfoSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                movie.genres.forEach { genre ->
+                movie.genres.forEach { genreKey ->
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.surface,
                         modifier = Modifier.padding(end = 8.dp)
                     ) {
                         Text(
-                            text = genre,
+                            text = stringResource(genreKey.labelRes),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurface
@@ -252,7 +253,7 @@ fun MovieInfoSection(
             IconButton(onClick = onFavoriteToggle) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite",
+                    contentDescription = stringResource(R.string.movie_details_favorite),
                     tint = if (isFavorite) Color(0xFFFF2D55) else MaterialTheme.colorScheme.onBackground
                 )
             }

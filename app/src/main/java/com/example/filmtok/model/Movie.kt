@@ -6,7 +6,7 @@ data class Movie(
     val posterUrl: String = "",
     val backdropUrl: String = "",
     val videoUrl: String = "",
-    val genres: List<String> = emptyList(),
+    val genres: List<MovieGenre> = emptyList(),
     val year: Int = 2024,
     val description: String = "",
     val rating: Double = 0.0,

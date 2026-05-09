@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,6 +33,7 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
 import com.example.filmtok.model.Movie
 import com.example.filmtok.viewmodel.ReelsViewModel
+import com.example.filmtok.R
 
 @Composable
 fun ReelsScreen(
@@ -53,7 +55,6 @@ fun ReelsScreen(
             modifier = Modifier.fillMaxSize(),
             beyondViewportPageCount = 1
         ) { page ->
-            // Sprawdzamy, czy ta strona jest aktualnie aktywna
             val isCurrentPage = pagerState.currentPage == page
 
             ReelItem(
@@ -75,20 +76,18 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit, isCurrentPage: B
             setMediaItem(mediaItem)
             prepare()
             repeatMode = Player.REPEAT_MODE_ALL
-            // Nie ustawiamy playWhenReady = true tutaj, zrobimy to w LaunchedEffect
         }
     }
 
     var isPlayerReady by remember { mutableStateOf(false) }
     var isPlaying by remember { mutableStateOf(false) }
 
-    // Reagowanie na zmianę strony - odtwarzanie tylko gdy jesteśmy na widoku
     LaunchedEffect(isCurrentPage) {
         if (isCurrentPage) {
             exoPlayer.play()
         } else {
             exoPlayer.pause()
-            exoPlayer.seekTo(0) // Opcjonalnie: wróć do początku gdy użytkownik przewinie dalej
+            exoPlayer.seekTo(0)
         }
     }
 
@@ -140,7 +139,6 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit, isCurrentPage: B
             }
         }
 
-        // Overlay do przyciemnienia tła pod napisy
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -152,7 +150,6 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit, isCurrentPage: B
                 )
         )
 
-        // Środkowa ikona Play (pokazuje się tylko gdy film jest zatrzymany)
         if (!isPlaying && isPlayerReady) {
             Icon(
                 imageVector = Icons.Default.PlayArrow,
@@ -165,21 +162,6 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit, isCurrentPage: B
             )
         }
 
-        // Prawy panel z akcjami
-//        Column(
-//            modifier = Modifier
-//                .align(Alignment.BottomEnd)
-//                .padding(bottom = 100.dp, end = 16.dp),
-//            horizontalAlignment = Alignment.CenterHorizontally
-//        ) {
-//            ReelActionItem(Icons.Default.Favorite, movie.likesCount.toString())
-//            Spacer(modifier = Modifier.height(20.dp))
-//            ReelActionItem(Icons.Default.PlayArrow, movie.commentsCount.toString(), "Koment.")
-//            Spacer(modifier = Modifier.height(20.dp))
-//            ReelActionItem(Icons.Default.Share, "Udost.")
-//        }
-
-        // Dolny panel z opisem
         Column(
             modifier = Modifier
                 .align(Alignment.BottomStart)
@@ -205,28 +187,8 @@ fun ReelItem(movie: Movie, onSeeDetailsClick: (String) -> Unit, isCurrentPage: B
                 shape = RoundedCornerShape(8.dp),
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text("Zobacz szczegóły", color = Color.White, fontSize = 12.sp)
+                Text(stringResource( R.string.reels_see_details), color = Color.White, fontSize = 12.sp)
             }
         }
-    }
-}
-
-@Composable
-fun ReelActionItem(icon: ImageVector, label: String, description: String = "") {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        IconButton(onClick = { /* Action */ }) {
-            Icon(
-                imageVector = icon,
-                contentDescription = description,
-                modifier = Modifier.size(32.dp),
-                tint = Color.White
-            )
-        }
-        Text(
-            text = label,
-            color = Color.White,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
