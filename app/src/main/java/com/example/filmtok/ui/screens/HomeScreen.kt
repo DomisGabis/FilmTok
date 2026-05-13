@@ -31,7 +31,7 @@ fun HomeScreen(
     onMovieClick: (String) -> Unit,
     viewModel: HomeViewModel = viewModel()
 ) {
-    val heroMovie by viewModel.heroMovie.collectAsState()
+    val heroMovie by viewModel.heroMovie.collectAsState() //dzieki collectAsState jak sie cos zmieni w bazie to od razu zmieni sie tez homescreen
     val recentlyWatched by viewModel.recentlyWatched.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
