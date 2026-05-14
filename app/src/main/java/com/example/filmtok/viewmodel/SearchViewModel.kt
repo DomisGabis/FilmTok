@@ -33,7 +33,7 @@ class SearchViewModel(
     }
 
     private fun loadMovies() {
-        viewModelScope.launch {
+        viewModelScope.launch {//korutyna
             try {
                 val movies = repository.getAllMovies()
                 _allMovies.value = movies.map { storageRepository.resolveMovieUrls(it) }

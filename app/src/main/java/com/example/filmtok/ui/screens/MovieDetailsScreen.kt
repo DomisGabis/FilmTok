@@ -66,16 +66,16 @@ fun MovieDetailsScreen(
     ) {
         if (isLoading) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)// kółeczko ładowania ekranu
             }
         } else {
             movie?.let { movieData ->
-                var showTrailer by remember { mutableStateOf(false) }
+                var showTrailer by remember { mutableStateOf(false) }//pamięta w jakim stanie jest trailer przy przewijaniu
 
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(rememberScrollState())//żeby przewijać góra dół
                 ) {
                     MovieHeader(
                         movie = movieData,
@@ -93,7 +93,7 @@ fun MovieDetailsScreen(
                     Spacer(modifier = Modifier.height(32.dp))
                 }
 
-                if (showTrailer && movieData.videoUrl.isNotEmpty()) {
+                if (showTrailer && movieData.videoUrl.isNotEmpty()) { //jak mamy tailery to je wyświetlamy
                     TrailerDialog(
                         videoUrl = movieData.videoUrl,
                         onDismiss = { showTrailer = false }
@@ -118,11 +118,11 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit, onTrailerClick: () -> Uni
             contentScale = ContentScale.Crop
         )
 
-        Box(
+        Box(//Box pozwala na nałożenie na siebie obraka i przycisku
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    Brush.verticalGradient(
+                    Brush.verticalGradient(//płynne przejście między zdj a tekstem
                         colors = listOf(Color.Transparent, MaterialTheme.colorScheme.background),
                         startY = 400f
                     )
@@ -160,8 +160,8 @@ fun MovieHeader(movie: Movie, onBackClick: () -> Unit, onTrailerClick: () -> Uni
 @Composable
 fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val exoPlayer = remember {
-        ExoPlayer.Builder(context).build()
+    val exoPlayer = remember { //remeber- tworzy obiekt tylko raz
+        ExoPlayer.Builder(context).build()//silnik google do odtwarzania wideo
     }
 
     LaunchedEffect(videoUrl) {
@@ -171,7 +171,7 @@ fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
         exoPlayer.playWhenReady = true
     }
 
-    DisposableEffect(Unit) {
+    DisposableEffect(Unit) {//po zamknieciu ekranu zamyka się odtwarzacz
         onDispose {
             exoPlayer.release()
         }
@@ -191,7 +191,7 @@ fun TrailerDialog(videoUrl: String, onDismiss: () -> Unit) {
             Box(
                 modifier = Modifier.fillMaxSize()
             ) {
-                AndroidView(
+                AndroidView( //wstawiamy ten odtwarzacz z andorida do jetpack compose
                     factory = { ctx ->
                         PlayerView(ctx).apply {
                             player = exoPlayer
@@ -281,14 +281,14 @@ fun MovieInfoSection(
 
 @Composable
 fun DescriptionSection(description: String) {
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }//zmienia czy opis jest rozwinięty
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = description,
             color = MaterialTheme.colorScheme.onBackground,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = if (isExpanded) Int.MAX_VALUE else 3,
-            overflow = TextOverflow.Ellipsis,
+            overflow = TextOverflow.Ellipsis,//jak tekst przekracza szerokość to sa dodane ...
             modifier = Modifier
                 .animateContentSize()
                 .clickable { isExpanded = !isExpanded }
