@@ -32,7 +32,6 @@ class ProfileIntegrationTest {
 
     @Before
     fun setup() {
-        // Mockowanie Uri.parse dla potrzeb testu uploadu
         mockkStatic(Uri::class)
         val mockUri = mockk<Uri>()
         every { Uri.parse(any()) } returns mockUri
@@ -45,7 +44,6 @@ class ProfileIntegrationTest {
 
     @Test
     fun `integration - loading profile fetches user data and favorite movies details`() = runTest {
-        // 1. Arrange
         val userId = "test_user"
         val favoriteIds = listOf("m1", "m2")
         val movie1 = Movie(id = "m1", title = "Movie 1")
@@ -58,14 +56,10 @@ class ProfileIntegrationTest {
         coEvery { movieRepository.getMovieDetails("m1") } returns movie1
         coEvery { movieRepository.getMovieDetails("m2") } returns movie2
 
-        // 2. Act
         viewModel = ProfileViewModel(userRepository, storageRepository, movieRepository)
 
-        // 3. Assert
-        // Sprawdzamy czy dane użytkownika są w stanie
         assertEquals("user@test.com", viewModel.user.value?.email)
-        
-        // Sprawdzamy czy lista Movie została poprawnie pobrana na podstawie ID
+
         assertEquals(2, viewModel.favoriteMovies.value.size)
         assertEquals("Movie 1", viewModel.favoriteMovies.value[0].title)
         assertEquals("Movie 2", viewModel.favoriteMovies.value[1].title)
@@ -73,7 +67,6 @@ class ProfileIntegrationTest {
 
     @Test
     fun `integration - updateProfilePicture uploads image and updates user model`() = runTest {
-        // 1. Arrange
         val userId = "test_user"
         val newImageUrl = "https://firebasestorage.../new_avatar.jpg"
         val mockUri = mockk<Uri>()
@@ -82,15 +75,11 @@ class ProfileIntegrationTest {
         coEvery { storageRepository.uploadImage(mockUri, any()) } returns newImageUrl
         
         viewModel = ProfileViewModel(userRepository, storageRepository, movieRepository)
-        
-        // 2. Act
+
         viewModel.updateProfilePicture(mockUri)
 
-        // 3. Assert
-        // Czy wywołano update w repozytorium?
         coVerify { userRepository.updateProfile(userId, mapOf("profileImageUrl" to newImageUrl)) }
-        
-        // Czy lokalny stan użytkownika został zaktualizowany?
+
         assertEquals(newImageUrl, viewModel.user.value?.profileImageUrl)
     }
 }

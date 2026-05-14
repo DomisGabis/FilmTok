@@ -37,17 +37,13 @@ class AuthIntegrationTest {
 
     @Before
     fun setup() {
-        // Mockowanie statyczne metod getInstance(), aby zwracały nasze makiety
         mockkStatic(FirebaseAuth::class)
         every { FirebaseAuth.getInstance() } returns mockAuth
         
         mockkStatic(FirebaseFirestore::class)
         every { FirebaseFirestore.getInstance() } returns mockDb
 
-        // Tworzymy PRAWDZIWE repozytorium z mockami Firebase
         userRepository = UserRepository(mockAuth, mockDb)
-        
-        // Tworzymy PRAWDZIWY ViewModel z prawdziwym repozytorium
         authViewModel = AuthViewModel(userRepository)
     }
 
@@ -58,46 +54,38 @@ class AuthIntegrationTest {
 
     @Test
     fun `login flow integration - successful sign in updates role to admin`() = runTest {
-        // 1. Przygotowanie danych
         val email = "admin@filmtok.pl"
         val password = "securePassword"
         val uid = "admin_uid_123"
 
-        // Symulacja sukcesu FirebaseAuth
         val mockAuthResult = mockk<AuthResult>()
         every { mockUser.uid } returns uid
         every { mockAuth.signInWithEmailAndPassword(email, password) } returns Tasks.forResult(mockAuthResult)
         every { mockAuthResult.user } returns mockUser
 
-        // Symulacja danych w Firestore (użytkownik jest adminem)
         every { mockDb.collection("users").document(uid).get() } returns Tasks.forResult(mockDoc)
         every { mockDoc.exists() } returns true
         every { mockDoc.getBoolean("isAdmin") } returns true
 
-        // 2. Akcja: Logowanie przez ViewModel
         authViewModel.signIn(email, password)
-        advanceUntilIdle() // Czekamy na zakończenie wszystkich korutyn w viewModelScope
+        advanceUntilIdle()
 
-        // 3. Weryfikacja: Czy łańcuch integracji zadziałał?
         assertEquals("admin", authViewModel.userRole.value)
     }
 
     @Test
     fun `logout flow integration - signing out clears user state in ViewModel`() = runTest {
-        // Symulacja stanu początkowego (zalogowany admin)
         every { mockDb.collection("users").document(any()).get() } returns Tasks.forResult(mockDoc)
-        every { mockDoc.exists() } returns true // Ważne: dokument musi istnieć
+        every { mockDoc.exists() } returns true
         every { mockDoc.getBoolean("isAdmin") } returns true
         
         authViewModel.checkUserRole("some_uid")
-        advanceUntilIdle() // Upewniamy się, że rola została pobrana
+        advanceUntilIdle()
         
         assertEquals("admin", authViewModel.userRole.value)
 
-        // Akcja: Wylogowanie
         authViewModel.signOut()
 
-        // Weryfikacja: Czy stan został wyczyszczony?
         assertEquals(null, authViewModel.userRole.value)
         verify { mockAuth.signOut() }
     }

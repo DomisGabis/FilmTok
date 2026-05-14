@@ -30,7 +30,6 @@ class AdminMovieIntegrationTest {
 
     @Before
     fun setup() {
-        // Mockowanie Uri.parse, aby uniknąć błędów JVM
         mockkStatic(Uri::class)
         val mockUri = mockk<Uri>()
         every { Uri.parse(any()) } returns mockUri
@@ -45,33 +44,25 @@ class AdminMovieIntegrationTest {
 
     @Test
     fun `integration - saving a new movie uploads files and saves document`() = runTest {
-        // 1. Arrange - wypełniamy formularz w ViewModelu
         val testTitle = "Interstellar"
         viewModel.onTitleChange(testTitle)
         viewModel.onDirectorChange("Christopher Nolan")
         viewModel.onYearChange("2014")
         viewModel.onGenreToggle(MovieGenre.SCI_FI)
-        
-        // Symulujemy wybrane pliki
+
         val posterUri = mockk<Uri>()
         viewModel.onPosterUriChange(posterUri)
 
-        // Mockowanie zachowania repozytoriów
         val generatedId = "new_movie_id"
         val uploadedUrl = "https://firebasestorage.../poster.jpg"
         
         every { movieRepository.getNewId() } returns generatedId
         coEvery { storageRepository.uploadImage(posterUri, any(), any()) } returns uploadedUrl
 
-        // 2. Act - wywołujemy zapis
-        viewModel.saveMovie(null) // null oznacza nowy film
+        viewModel.saveMovie(null)
 
-        // 3. Assert - weryfikujemy integrację całego flow
-        
-        // Czy plik został wysłany do Storage?
         coVerify { storageRepository.uploadImage(posterUri, match { it.contains(generatedId) }, any()) }
-        
-        // Czy film został zapisany w bazie z poprawnym adresem URL ze Storage?
+
         val movieSlot = slot<Movie>()
         coVerify { movieRepository.saveMovie(capture(movieSlot)) }
         

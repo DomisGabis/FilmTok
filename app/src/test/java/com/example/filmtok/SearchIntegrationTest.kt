@@ -38,9 +38,7 @@ class SearchIntegrationTest {
 
     @Before
     fun setup() {
-        // Symulujemy, że repozytorium zwraca listę filmów
         coEvery { movieRepository.getAllMovies() } returns testMovies
-        // StorageRepository po prostu przepuszcza filmy dalej
         coEvery { storageRepository.resolveMovieUrls(any()) } answers { firstArg() }
         
         searchViewModel = SearchViewModel(movieRepository, storageRepository)
@@ -53,17 +51,13 @@ class SearchIntegrationTest {
 
     @Test
     fun `integration - searching for Nolan returns only his movies`() = runTest {
-        // Aktywujemy StateFlow poprzez uruchomienie zbierania danych w tle
         val job = backgroundScope.launch { searchViewModel.filteredMovies.collect() }
-        
-        // Czekamy na wykonanie init i loadMovies()
+
         advanceUntilIdle()
 
-        // Act - Zmieniamy frazę wyszukiwania
         searchViewModel.onSearchQueryChange("Nolan")
-        advanceUntilIdle() // Czekamy na przetworzenie zmiany przez Flow
+        advanceUntilIdle()
 
-        // Assert - Sprawdzamy stan pofiltrowanej listy w ViewModelu
         val filtered = searchViewModel.filteredMovies.value
         assertEquals(2, filtered.size)
         assertEquals("The Dark Knight", filtered[0].title)
@@ -72,17 +66,13 @@ class SearchIntegrationTest {
 
     @Test
     fun `integration - filtering by Sci-Fi returns only Sci-Fi movies`() = runTest {
-        // Aktywujemy StateFlow
         val job = backgroundScope.launch { searchViewModel.filteredMovies.collect() }
-        
-        // Czekamy na wykonanie init i loadMovies()
+
         advanceUntilIdle()
 
-        // Act - Wybieramy gatunek Sci-Fi
         searchViewModel.onGenreSelect(MovieGenre.SCI_FI.labelRes)
         advanceUntilIdle()
 
-        // Assert
         val filtered = searchViewModel.filteredMovies.value
         assertEquals(1, filtered.size)
         assertEquals("Inception", filtered[0].title)

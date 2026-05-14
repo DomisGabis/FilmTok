@@ -30,7 +30,7 @@ class HomeIntegrationTest {
 
     @Before
     fun setup() {
-        // ViewModel przy starcie wywołuje observeMovies(), więc musimy przygotować mocki wcześniej
+
     }
 
     @After
@@ -40,45 +40,33 @@ class HomeIntegrationTest {
 
     @Test
     fun `integration - home screen loads movies and resolves their urls`() = runTest {
-        // 1. Arrange
         val rawMovie = Movie(id = "1", title = "Raw Movie", posterUrl = "path/to/poster")
         val resolvedMovie = rawMovie.copy(posterUrl = "https://url.to/poster")
-        
-        // Symulujemy, że baza zwraca strumień z jednym filmem
+
         every { movieRepository.getMoviesFlow() } returns flowOf(listOf(rawMovie))
-        
-        // Symulujemy, że StorageRepository zamienia ścieżkę na URL
+
         coEvery { storageRepository.resolveMovieUrls(rawMovie) } returns resolvedMovie
 
-        // 2. Act - Tworzymy ViewModel (co wyzwala init i observeMovies)
         homeViewModel = HomeViewModel(movieRepository, storageRepository)
 
-        // 3. Assert
-        // Sprawdzamy, czy film w ViewModelu jest tym "rozwiązanym" (z pełnym adresem URL)
         assertEquals("https://url.to/poster", homeViewModel.heroMovie.value?.posterUrl)
-        
-        // Sprawdzamy, czy film trafił na listę "Recently Watched"
+
         assertEquals(1, homeViewModel.recentlyWatched.value.size)
         assertEquals("https://url.to/poster", homeViewModel.recentlyWatched.value[0].posterUrl)
-        
-        // Sprawdzamy, czy stan ładowania został wyłączony
+
         assertFalse(homeViewModel.isLoading.value)
     }
 
     @Test
     fun `integration - hero movie is selected correctly from list`() = runTest {
-        // 1. Arrange
         val movie1 = Movie(id = "1", title = "Regular", isHero = false)
         val movie2 = Movie(id = "2", title = "The Hero", isHero = true)
         
         every { movieRepository.getMoviesFlow() } returns flowOf(listOf(movie1, movie2))
         coEvery { storageRepository.resolveMovieUrls(any()) } answers { firstArg() }
 
-        // 2. Act
         homeViewModel = HomeViewModel(movieRepository, storageRepository)
 
-        // 3. Assert
-        // ViewModel powinien znaleźć film z flagą isHero = true
         assertEquals("2", homeViewModel.heroMovie.value?.id)
         assertEquals("The Hero", homeViewModel.heroMovie.value?.title)
     }
