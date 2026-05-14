@@ -18,18 +18,14 @@ class AdminValidationTest {
 
     private lateinit var viewModel: AdminViewModel
 
-    // Tworzymy makiety repozytoriów
     private val movieRepository = mockk<MovieRepository>(relaxed = true)
     private val storageRepository = mockk<StorageRepository>(relaxed = true)
 
     @Before
     fun setup() {
-        // Mockujemy statyczne metody klasy Uri, aby nie rzucały błędów w środowisku JVM
         mockkStatic(Uri::class)
         every { Uri.parse(any()) } returns mockk(relaxed = true)
 
-        // Przekazujemy zmockowane repozytoria jawnym konstruktorem.
-        // Dzięki temu unikamy wywołania domyślnego konstruktora, który próbowałby inicjalizować Firebase.
         viewModel = AdminViewModel(
             repository = movieRepository,
             storageRepository = storageRepository

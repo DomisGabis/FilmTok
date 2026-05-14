@@ -57,10 +57,6 @@ class AdminViewModel(
     private val _uiState = MutableStateFlow(AdminMovieFormState())
     val uiState: StateFlow<AdminMovieFormState> = _uiState.asStateFlow()
 
-    init {
-        // Nie ładujemy filmów automatycznie w init, żeby nie blokować UI dodawania
-    }
-
     fun loadMovies() {
         viewModelScope.launch {
             _isLoading.value = true
@@ -213,7 +209,6 @@ class AdminViewModel(
                     if (member.imageUrl.startsWith("content://") || member.imageUrl.startsWith("file://")) {
                         val uri = Uri.parse(member.imageUrl)
                         val uploadedUrl = storageRepository.uploadImage(uri, "movies/$id/cast/actor_${index}_${System.currentTimeMillis()}.jpg") {
-                            // opcjonalnie postęp dla obsady
                         }
                         member.copy(imageUrl = uploadedUrl)
                     } else {

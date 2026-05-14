@@ -70,7 +70,6 @@ class ProfileViewModel(
                 userRepository.updateProfile(userId, mapOf("profileImageUrl" to url))
                 _user.value = _user.value?.copy(profileImageUrl = url)
             } catch (e: Exception) {
-                // Handle error
             } finally {
                 _isUploading.value = false
             }
